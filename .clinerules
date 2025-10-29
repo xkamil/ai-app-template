@@ -1,0 +1,6 @@
+# Project rules
+1. use newest version of reactjs
+2. for styles use bootstrap
+3. as a result of build I want single html file with no other files required to use app. All styles should be embedded in html and all js
+4. create .gitignore file with proper entries
+5. add github actions that will build and publish app single html file as github pages
