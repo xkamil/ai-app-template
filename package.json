@@ -8,9 +8,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.77.0",
+    "bootstrap": "^5.3.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "bootstrap": "^5.3.3"
+    "react-router-dom": "^7.9.5"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.4",
