@@ -98,13 +98,136 @@ CREATE POLICY "Users can delete their own exercises"
     USING (auth.uid() = user_id);
 
 -- =====================================================
--- TABLE 3: WORKOUTS
+-- TABLE 3: WORKOUT PLANS
+-- =====================================================
+-- Stores workout plan templates that users can create and reuse
+
+CREATE TABLE IF NOT EXISTS public.workout_plans (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+    name TEXT NOT NULL,
+    color TEXT NOT NULL DEFAULT '#FF6B35',
+    description TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    UNIQUE(user_id, name)
+);
+
+COMMENT ON TABLE public.workout_plans IS 'Workout plan templates that can be reused';
+COMMENT ON COLUMN public.workout_plans.name IS 'Name of the workout plan (e.g., "Push Day", "Pull Day")';
+COMMENT ON COLUMN public.workout_plans.color IS 'Hex color code for visual identification';
+
+-- Enable Row Level Security
+ALTER TABLE public.workout_plans ENABLE ROW LEVEL SECURITY;
+
+-- RLS Policies for workout_plans
+CREATE POLICY "Users can view their own workout plans"
+    ON public.workout_plans
+    FOR SELECT
+    USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert their own workout plans"
+    ON public.workout_plans
+    FOR INSERT
+    WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own workout plans"
+    ON public.workout_plans
+    FOR UPDATE
+    USING (auth.uid() = user_id)
+    WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete their own workout plans"
+    ON public.workout_plans
+    FOR DELETE
+    USING (auth.uid() = user_id);
+
+-- =====================================================
+-- TABLE 4: WORKOUT PLAN EXERCISES
+-- =====================================================
+-- Stores exercises that belong to a workout plan with suggested sets
+
+CREATE TABLE IF NOT EXISTS public.workout_plan_exercises (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    workout_plan_id UUID NOT NULL REFERENCES public.workout_plans(id) ON DELETE CASCADE,
+    exercise_id UUID NOT NULL REFERENCES public.exercises(id) ON DELETE CASCADE,
+    order_index INTEGER NOT NULL DEFAULT 0,
+    suggested_sets INTEGER DEFAULT 3,
+    notes TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    UNIQUE(workout_plan_id, exercise_id),
+    CONSTRAINT valid_suggested_sets CHECK (suggested_sets IS NULL OR suggested_sets > 0)
+);
+
+COMMENT ON TABLE public.workout_plan_exercises IS 'Exercises in a workout plan with suggested set counts';
+COMMENT ON COLUMN public.workout_plan_exercises.order_index IS 'Order of exercise in plan (0-based index)';
+COMMENT ON COLUMN public.workout_plan_exercises.suggested_sets IS 'Suggested number of sets for this exercise';
+
+-- Enable Row Level Security
+ALTER TABLE public.workout_plan_exercises ENABLE ROW LEVEL SECURITY;
+
+-- RLS Policies for workout_plan_exercises
+CREATE POLICY "Users can view their own workout plan exercises"
+    ON public.workout_plan_exercises
+    FOR SELECT
+    USING (
+        EXISTS (
+            SELECT 1 FROM public.workout_plans
+            WHERE workout_plans.id = workout_plan_exercises.workout_plan_id
+            AND workout_plans.user_id = auth.uid()
+        )
+    );
+
+CREATE POLICY "Users can insert their own workout plan exercises"
+    ON public.workout_plan_exercises
+    FOR INSERT
+    WITH CHECK (
+        EXISTS (
+            SELECT 1 FROM public.workout_plans
+            WHERE workout_plans.id = workout_plan_exercises.workout_plan_id
+            AND workout_plans.user_id = auth.uid()
+        )
+    );
+
+CREATE POLICY "Users can update their own workout plan exercises"
+    ON public.workout_plan_exercises
+    FOR UPDATE
+    USING (
+        EXISTS (
+            SELECT 1 FROM public.workout_plans
+            WHERE workout_plans.id = workout_plan_exercises.workout_plan_id
+            AND workout_plans.user_id = auth.uid()
+        )
+    )
+    WITH CHECK (
+        EXISTS (
+            SELECT 1 FROM public.workout_plans
+            WHERE workout_plans.id = workout_plan_exercises.workout_plan_id
+            AND workout_plans.user_id = auth.uid()
+        )
+    );
+
+CREATE POLICY "Users can delete their own workout plan exercises"
+    ON public.workout_plan_exercises
+    FOR DELETE
+    USING (
+        EXISTS (
+            SELECT 1 FROM public.workout_plans
+            WHERE workout_plans.id = workout_plan_exercises.workout_plan_id
+            AND workout_plans.user_id = auth.uid()
+        )
+    );
+
+-- =====================================================
+-- TABLE 5: WORKOUTS
 -- =====================================================
 -- Stores workout sessions logged by users
 
 CREATE TABLE IF NOT EXISTS public.workouts (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+    workout_plan_id UUID REFERENCES public.workout_plans(id) ON DELETE SET NULL,
     name TEXT,
     workout_date TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     notes TEXT,
@@ -113,6 +236,7 @@ CREATE TABLE IF NOT EXISTS public.workouts (
 );
 
 COMMENT ON TABLE public.workouts IS 'User workout sessions with date and notes';
+COMMENT ON COLUMN public.workouts.workout_plan_id IS 'Optional reference to the workout plan this workout was based on';
 COMMENT ON COLUMN public.workouts.name IS 'Optional name for the workout (e.g., "Upper Body Day")';
 COMMENT ON COLUMN public.workouts.workout_date IS 'Date and time when the workout was performed';
 
@@ -142,7 +266,7 @@ CREATE POLICY "Users can delete their own workouts"
     USING (auth.uid() = user_id);
 
 -- =====================================================
--- TABLE 4: WORKOUT EXERCISES
+-- TABLE 6: WORKOUT EXERCISES
 -- =====================================================
 -- Junction table linking exercises to workouts
 
@@ -218,7 +342,7 @@ CREATE POLICY "Users can delete their own workout exercises"
     );
 
 -- =====================================================
--- TABLE 5: EXERCISE SETS
+-- TABLE 7: EXERCISE SETS
 -- =====================================================
 -- Stores individual sets for each exercise with performance data
 
@@ -347,6 +471,7 @@ COMMENT ON VIEW public.personal_records IS 'Auto-calculated personal records for
 -- Index for filtering by user_id (most common query pattern)
 CREATE INDEX IF NOT EXISTS idx_muscle_groups_user_id ON public.muscle_groups(user_id);
 CREATE INDEX IF NOT EXISTS idx_exercises_user_id ON public.exercises(user_id);
+CREATE INDEX IF NOT EXISTS idx_workout_plans_user_id ON public.workout_plans(user_id);
 CREATE INDEX IF NOT EXISTS idx_workouts_user_id ON public.workouts(user_id);
 
 -- Index for exercise lookups by muscle group
@@ -357,6 +482,9 @@ CREATE INDEX IF NOT EXISTS idx_workouts_workout_date ON public.workouts(workout_
 CREATE INDEX IF NOT EXISTS idx_workouts_user_date ON public.workouts(user_id, workout_date DESC);
 
 -- Indexes for foreign key relationships
+CREATE INDEX IF NOT EXISTS idx_workout_plan_exercises_plan_id ON public.workout_plan_exercises(workout_plan_id);
+CREATE INDEX IF NOT EXISTS idx_workout_plan_exercises_exercise_id ON public.workout_plan_exercises(exercise_id);
+CREATE INDEX IF NOT EXISTS idx_workouts_workout_plan_id ON public.workouts(workout_plan_id);
 CREATE INDEX IF NOT EXISTS idx_workout_exercises_workout_id ON public.workout_exercises(workout_id);
 CREATE INDEX IF NOT EXISTS idx_workout_exercises_exercise_id ON public.workout_exercises(exercise_id);
 CREATE INDEX IF NOT EXISTS idx_exercise_sets_workout_exercise_id ON public.exercise_sets(workout_exercise_id);
@@ -403,6 +531,16 @@ CREATE TRIGGER update_exercise_sets_updated_at
     FOR EACH ROW
     EXECUTE FUNCTION public.update_updated_at_column();
 
+CREATE TRIGGER update_workout_plans_updated_at
+    BEFORE UPDATE ON public.workout_plans
+    FOR EACH ROW
+    EXECUTE FUNCTION public.update_updated_at_column();
+
+CREATE TRIGGER update_workout_plan_exercises_updated_at
+    BEFORE UPDATE ON public.workout_plan_exercises
+    FOR EACH ROW
+    EXECUTE FUNCTION public.update_updated_at_column();
+
 -- =====================================================
 -- SCHEMA COMPLETE
 -- =====================================================
@@ -411,9 +549,11 @@ CREATE TRIGGER update_exercise_sets_updated_at
 -- Tables created:
 -- 1. muscle_groups - User-created categories
 -- 2. exercises - User-created exercises with optional categories
--- 3. workouts - Workout sessions
--- 4. workout_exercises - Exercises in workouts
--- 5. exercise_sets - Individual sets with reps/weight/duration
+-- 3. workout_plans - Workout plan templates
+-- 4. workout_plan_exercises - Exercises in plans with suggested sets
+-- 5. workouts - Workout sessions (with optional plan reference)
+-- 6. workout_exercises - Exercises in workouts
+-- 7. exercise_sets - Individual sets with reps/weight/duration
 --
 -- Views created:
 -- 1. personal_records - Auto-calculated PRs

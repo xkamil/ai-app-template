@@ -13,10 +13,10 @@ const BottomNav = () => {
       label: t('bottomNav.workouts')
     },
     {
-      path: '/workout/new',
-      icon: '➕',
-      labelKey: 'bottomNav.new',
-      label: t('bottomNav.new')
+      path: '/plans',
+      icon: '📋',
+      labelKey: 'bottomNav.plans',
+      label: t('bottomNav.plans')
     },
     {
       path: '/exercises',

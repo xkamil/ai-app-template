@@ -70,7 +70,7 @@ export default {
   },
   bottomNav: {
     workouts: "Treningi",
-    new: "Nowy",
+    plans: "Plany",
     exercises: "Ćwiczenia",
     stats: "Statystyki",
     profile: "Profil"
@@ -118,9 +118,22 @@ export default {
     cancel: "Anuluj",
     ok: "OK",
     back: "Wstecz",
+    step0: {
+      title: "Wybierz Plan",
+      progress: "Krok 1/4",
+      search: "Wyszukaj plan...",
+      createNew: "Utwórz Nowy Plan",
+      yourPlans: "Twoje plany",
+      noResults: "Brak planów pasujących do wyszukiwania",
+      emptyState: {
+        title: "Brak planów treningowych",
+        subtitle: "Najpierw utwórz plan treningowy, aby rozpocząć trening",
+        cta: "UTWÓRZ PLAN"
+      }
+    },
     step1: {
       title: "Wybierz ćwiczenia",
-      progress: "Krok 1/3",
+      progress: "Krok 2/4",
       search: "Wyszukaj ćwiczenie...",
       selected: "Wybrane ({count})",
       yourExercises: "Twoje ćwiczenia",
@@ -129,7 +142,7 @@ export default {
     },
     step2: {
       title: "Loguj serie",
-      progress: "Krok 2/3",
+      progress: "Krok 3/4",
       nameLabel: "Nazwa (opcjonalnie)",
       namePlaceholder: "np. Upper Body A",
       set: "Seria {number}",
@@ -234,6 +247,39 @@ export default {
       title: "Brak danych",
       subtitle: "Wykonaj pierwszy trening aby zobaczyć swoje statystyki i rekordy!",
       cta: "START WORKOUT"
+    }
+  },
+  plans: {
+    title: "Plany Treningowe",
+    subtitle: "Zarządzaj swoimi planami treningowymi",
+    create: "Utwórz Plan",
+    exercises: "ćwiczeń",
+    sets: "serii",
+    more: "więcej",
+    deleteConfirm: "Czy na pewno chcesz usunąć plan \"{name}\"?",
+    deleteError: "Nie można usunąć planu",
+    emptyState: {
+      title: "Brak planów treningowych",
+      subtitle: "Utwórz swój pierwszy plan treningowy!",
+      cta: "UTWÓRZ PLAN"
+    },
+    modal: {
+      createTitle: "Nowy Plan Treningowy",
+      editTitle: "Edytuj Plan",
+      name: "Nazwa",
+      namePlaceholder: "np. Push Day",
+      color: "Kolor",
+      description: "Opis",
+      descriptionPlaceholder: "Opcjonalny opis planu...",
+      exercises: "Ćwiczenia",
+      noExercises: "Brak wybranych ćwiczeń. Wyszukaj poniżej aby dodać.",
+      searchExercises: "Wyszukaj ćwiczenia...",
+      noResults: "Brak wyników",
+      nameRequired: "Nazwa planu jest wymagana",
+      exercisesRequired: "Dodaj przynajmniej jedno ćwiczenie",
+      save: "ZAPISZ",
+      create: "UTWÓRZ PLAN",
+      cancel: "Anuluj"
     }
   },
   profile: {

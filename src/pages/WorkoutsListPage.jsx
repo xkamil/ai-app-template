@@ -20,7 +20,7 @@ const WorkoutsListPage = () => {
   };
 
   const handleNewWorkout = () => {
-    navigate('/workout/new');
+    navigate('/plans');
   };
 
   return (

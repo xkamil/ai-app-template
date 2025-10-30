@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { useExercise } from '../context/ExerciseContext';
 
-const ExerciseSelectionStep = ({ selectedExercises, onToggleExercise, onNext }) => {
+const ExerciseSelectionStep = ({ selectedExercises, onToggleExercise, onNext, onBack }) => {
   const { t } = useLanguage();
   const { exercises, muscleGroups } = useExercise();
   const [searchQuery, setSearchQuery] = useState('');
@@ -60,21 +60,40 @@ const ExerciseSelectionStep = ({ selectedExercises, onToggleExercise, onNext }) 
         top: 0,
         zIndex: 10
       }}>
-        <div style={{
-          fontSize: 'var(--text-xs)',
-          color: 'var(--text-tertiary)',
-          marginBottom: 'var(--space-2)'
-        }}>
-          {t('newWorkout.step1.progress')}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-2)' }}>
+          {onBack && (
+            <button
+              onClick={onBack}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: 'var(--text-secondary)',
+                fontSize: 'var(--text-2xl)',
+                cursor: 'pointer',
+                padding: 0
+              }}
+            >
+              ←
+            </button>
+          )}
+          <div style={{ flex: 1 }}>
+            <div style={{
+              fontSize: 'var(--text-xs)',
+              color: 'var(--text-tertiary)',
+              marginBottom: 'var(--space-1)'
+            }}>
+              {t('newWorkout.step1.progress')}
+            </div>
+            <h2 style={{
+              fontSize: 'var(--text-xl)',
+              fontWeight: 'var(--font-bold)',
+              color: 'var(--text-primary)',
+              margin: 0
+            }}>
+              {t('newWorkout.step1.title')}
+            </h2>
+          </div>
         </div>
-        <h2 style={{
-          fontSize: 'var(--text-xl)',
-          fontWeight: 'var(--font-bold)',
-          color: 'var(--text-primary)',
-          margin: 0
-        }}>
-          {t('newWorkout.step1.title')}
-        </h2>
 
         {/* Selected Count Badge */}
         {selectedExercises.length > 0 && (

@@ -4,6 +4,7 @@ import { AuthProvider } from './context/AuthContext'
 import { LanguageProvider } from './context/LanguageContext'
 import { ExerciseProvider } from './context/ExerciseContext'
 import { WorkoutProvider } from './context/WorkoutContext'
+import { WorkoutPlanProvider } from './context/WorkoutPlanContext'
 import PrivateRoute from './components/PrivateRoute'
 import LoginPage from './pages/LoginPage'
 import SignUpPage from './pages/SignUpPage'
@@ -13,6 +14,7 @@ import NewWorkoutPage from './pages/NewWorkoutPage'
 import ExercisesLibraryPage from './pages/ExercisesLibraryPage'
 import StatisticsPage from './pages/StatisticsPage'
 import ProfilePage from './pages/ProfilePage'
+import WorkoutPlansPage from './pages/WorkoutPlansPage'
 
 function App() {
   return (
@@ -20,7 +22,8 @@ function App() {
       <AuthProvider>
         <ExerciseProvider>
           <WorkoutProvider>
-            <HashRouter>
+            <WorkoutPlanProvider>
+              <HashRouter>
               <Routes>
                 <Route path="/" element={<LoginPage />} />
                 <Route path="/signup" element={<SignUpPage />} />
@@ -67,6 +70,14 @@ function App() {
                     </PrivateRoute>
                   }
                 />
+                <Route
+                  path="/plans"
+                  element={
+                    <PrivateRoute>
+                      <WorkoutPlansPage />
+                    </PrivateRoute>
+                  }
+                />
 
                 {/* Redirect old dashboard to workouts */}
                 <Route path="/dashboard" element={<Navigate to="/workouts" replace />} />
@@ -74,7 +85,8 @@ function App() {
                 {/* Catch all - redirect to login or workouts */}
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
-            </HashRouter>
+              </HashRouter>
+            </WorkoutPlanProvider>
           </WorkoutProvider>
         </ExerciseProvider>
       </AuthProvider>

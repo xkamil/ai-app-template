@@ -30,6 +30,7 @@ export const WorkoutProvider = ({ children }) => {
         .from('workouts')
         .select(`
           *,
+          workout_plan:workout_plans(id, name, color),
           workout_exercises(
             id,
             order_index,
@@ -100,6 +101,7 @@ export const WorkoutProvider = ({ children }) => {
         .from('workouts')
         .insert([{
           user_id: user.id,
+          workout_plan_id: workoutPayload.workout_plan_id || null,
           name: workoutPayload.name,
           workout_date: workoutPayload.workout_date,
           notes: workoutPayload.notes

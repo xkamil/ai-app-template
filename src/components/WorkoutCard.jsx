@@ -47,7 +47,34 @@ const WorkoutCard = ({ workout, onDelete }) => {
       {/* Workout Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 'var(--space-3)' }}>
         <div style={{ flex: 1 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-1)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-1)', flexWrap: 'wrap' }}>
+            {workout.workout_plan && (
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 'var(--space-1)',
+                padding: '4px 8px',
+                background: 'var(--bg-tertiary)',
+                borderRadius: 'var(--radius-sm)',
+                borderLeft: `3px solid ${workout.workout_plan.color || '#FF6B35'}`
+              }}>
+                <div
+                  style={{
+                    width: '8px',
+                    height: '8px',
+                    borderRadius: '50%',
+                    backgroundColor: workout.workout_plan.color || '#FF6B35'
+                  }}
+                />
+                <span style={{
+                  fontSize: 'var(--text-xs)',
+                  color: 'var(--text-secondary)',
+                  fontWeight: 'var(--font-medium)'
+                }}>
+                  {workout.workout_plan.name}
+                </span>
+              </div>
+            )}
             <h3 style={{
               fontSize: 'var(--text-lg)',
               fontWeight: 'var(--font-semibold)',

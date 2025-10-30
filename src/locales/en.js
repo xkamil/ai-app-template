@@ -70,7 +70,7 @@ export default {
   },
   bottomNav: {
     workouts: "Workouts",
-    new: "New",
+    plans: "Plans",
     exercises: "Exercises",
     stats: "Stats",
     profile: "Profile"
@@ -118,9 +118,22 @@ export default {
     cancel: "Cancel",
     ok: "OK",
     back: "Back",
+    step0: {
+      title: "Select Plan",
+      progress: "Step 1/4",
+      search: "Search plans...",
+      createNew: "Create New Plan",
+      yourPlans: "Your plans",
+      noResults: "No plans matching your search",
+      emptyState: {
+        title: "No workout plans",
+        subtitle: "Create a workout plan first to start training",
+        cta: "CREATE PLAN"
+      }
+    },
     step1: {
       title: "Select exercises",
-      progress: "Step 1/3",
+      progress: "Step 2/4",
       search: "Search exercise...",
       selected: "Selected ({count})",
       yourExercises: "Your exercises",
@@ -129,7 +142,7 @@ export default {
     },
     step2: {
       title: "Log sets",
-      progress: "Step 2/3",
+      progress: "Step 3/4",
       nameLabel: "Name (optional)",
       namePlaceholder: "e.g. Upper Body A",
       set: "Set {number}",
@@ -234,6 +247,39 @@ export default {
       title: "No data yet",
       subtitle: "Complete your first workout to see your stats and records!",
       cta: "START WORKOUT"
+    }
+  },
+  plans: {
+    title: "Workout Plans",
+    subtitle: "Manage your workout plans",
+    create: "Create Plan",
+    exercises: "exercises",
+    sets: "sets",
+    more: "more",
+    deleteConfirm: "Are you sure you want to delete plan \"{name}\"?",
+    deleteError: "Cannot delete plan",
+    emptyState: {
+      title: "No workout plans",
+      subtitle: "Create your first workout plan!",
+      cta: "CREATE PLAN"
+    },
+    modal: {
+      createTitle: "New Workout Plan",
+      editTitle: "Edit Plan",
+      name: "Name",
+      namePlaceholder: "e.g. Push Day",
+      color: "Color",
+      description: "Description",
+      descriptionPlaceholder: "Optional plan description...",
+      exercises: "Exercises",
+      noExercises: "No exercises selected. Search below to add.",
+      searchExercises: "Search exercises...",
+      noResults: "No results found",
+      nameRequired: "Plan name is required",
+      exercisesRequired: "Add at least one exercise",
+      save: "SAVE",
+      create: "CREATE PLAN",
+      cancel: "Cancel"
     }
   },
   profile: {
