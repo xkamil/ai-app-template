@@ -1,0 +1,424 @@
+-- =====================================================
+-- WORKOUT DIARY DATABASE SCHEMA FOR SUPABASE
+-- =====================================================
+-- This file contains the complete database schema for a workout diary application
+-- with Row Level Security (RLS) enabled for all user-specific tables.
+--
+-- Execute this file in Supabase SQL Editor to create all tables, policies, and indexes.
+-- =====================================================
+
+-- Enable necessary extensions
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+-- =====================================================
+-- TABLE 1: MUSCLE GROUPS
+-- =====================================================
+-- Stores muscle group categories for organizing exercises
+-- Users can create their own custom muscle groups
+
+CREATE TABLE IF NOT EXISTS public.muscle_groups (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+    name TEXT NOT NULL,
+    description TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    UNIQUE(user_id, name)
+);
+
+COMMENT ON TABLE public.muscle_groups IS 'User-created muscle group categories for organizing exercises';
+
+-- Enable Row Level Security
+ALTER TABLE public.muscle_groups ENABLE ROW LEVEL SECURITY;
+
+-- RLS Policies for muscle_groups
+CREATE POLICY "Users can view their own muscle groups"
+    ON public.muscle_groups
+    FOR SELECT
+    USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert their own muscle groups"
+    ON public.muscle_groups
+    FOR INSERT
+    WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own muscle groups"
+    ON public.muscle_groups
+    FOR UPDATE
+    USING (auth.uid() = user_id)
+    WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete their own muscle groups"
+    ON public.muscle_groups
+    FOR DELETE
+    USING (auth.uid() = user_id);
+
+-- =====================================================
+-- TABLE 2: EXERCISES
+-- =====================================================
+-- Stores user-created exercises with optional muscle group categorization
+
+CREATE TABLE IF NOT EXISTS public.exercises (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+    name TEXT NOT NULL,
+    muscle_group_id UUID REFERENCES public.muscle_groups(id) ON DELETE SET NULL,
+    description TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    UNIQUE(user_id, name)
+);
+
+COMMENT ON TABLE public.exercises IS 'User-created exercises with optional muscle group category';
+COMMENT ON COLUMN public.exercises.muscle_group_id IS 'Optional reference to muscle group - can be NULL';
+
+-- Enable Row Level Security
+ALTER TABLE public.exercises ENABLE ROW LEVEL SECURITY;
+
+-- RLS Policies for exercises
+CREATE POLICY "Users can view their own exercises"
+    ON public.exercises
+    FOR SELECT
+    USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert their own exercises"
+    ON public.exercises
+    FOR INSERT
+    WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own exercises"
+    ON public.exercises
+    FOR UPDATE
+    USING (auth.uid() = user_id)
+    WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete their own exercises"
+    ON public.exercises
+    FOR DELETE
+    USING (auth.uid() = user_id);
+
+-- =====================================================
+-- TABLE 3: WORKOUTS
+-- =====================================================
+-- Stores workout sessions logged by users
+
+CREATE TABLE IF NOT EXISTS public.workouts (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+    name TEXT,
+    workout_date TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    notes TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+COMMENT ON TABLE public.workouts IS 'User workout sessions with date and notes';
+COMMENT ON COLUMN public.workouts.name IS 'Optional name for the workout (e.g., "Upper Body Day")';
+COMMENT ON COLUMN public.workouts.workout_date IS 'Date and time when the workout was performed';
+
+-- Enable Row Level Security
+ALTER TABLE public.workouts ENABLE ROW LEVEL SECURITY;
+
+-- RLS Policies for workouts
+CREATE POLICY "Users can view their own workouts"
+    ON public.workouts
+    FOR SELECT
+    USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert their own workouts"
+    ON public.workouts
+    FOR INSERT
+    WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own workouts"
+    ON public.workouts
+    FOR UPDATE
+    USING (auth.uid() = user_id)
+    WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete their own workouts"
+    ON public.workouts
+    FOR DELETE
+    USING (auth.uid() = user_id);
+
+-- =====================================================
+-- TABLE 4: WORKOUT EXERCISES
+-- =====================================================
+-- Junction table linking exercises to workouts
+
+CREATE TABLE IF NOT EXISTS public.workout_exercises (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    workout_id UUID NOT NULL REFERENCES public.workouts(id) ON DELETE CASCADE,
+    exercise_id UUID NOT NULL REFERENCES public.exercises(id) ON DELETE CASCADE,
+    order_index INTEGER NOT NULL DEFAULT 0,
+    notes TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    UNIQUE(workout_id, exercise_id)
+);
+
+COMMENT ON TABLE public.workout_exercises IS 'Links exercises to workouts with ordering';
+COMMENT ON COLUMN public.workout_exercises.order_index IS 'Order of exercise in workout (0-based index)';
+COMMENT ON COLUMN public.workout_exercises.notes IS 'Notes specific to this exercise in this workout';
+
+-- Enable Row Level Security
+ALTER TABLE public.workout_exercises ENABLE ROW LEVEL SECURITY;
+
+-- RLS Policies for workout_exercises
+-- Users can only access workout_exercises if they own the parent workout
+CREATE POLICY "Users can view their own workout exercises"
+    ON public.workout_exercises
+    FOR SELECT
+    USING (
+        EXISTS (
+            SELECT 1 FROM public.workouts
+            WHERE workouts.id = workout_exercises.workout_id
+            AND workouts.user_id = auth.uid()
+        )
+    );
+
+CREATE POLICY "Users can insert their own workout exercises"
+    ON public.workout_exercises
+    FOR INSERT
+    WITH CHECK (
+        EXISTS (
+            SELECT 1 FROM public.workouts
+            WHERE workouts.id = workout_exercises.workout_id
+            AND workouts.user_id = auth.uid()
+        )
+    );
+
+CREATE POLICY "Users can update their own workout exercises"
+    ON public.workout_exercises
+    FOR UPDATE
+    USING (
+        EXISTS (
+            SELECT 1 FROM public.workouts
+            WHERE workouts.id = workout_exercises.workout_id
+            AND workouts.user_id = auth.uid()
+        )
+    )
+    WITH CHECK (
+        EXISTS (
+            SELECT 1 FROM public.workouts
+            WHERE workouts.id = workout_exercises.workout_id
+            AND workouts.user_id = auth.uid()
+        )
+    );
+
+CREATE POLICY "Users can delete their own workout exercises"
+    ON public.workout_exercises
+    FOR DELETE
+    USING (
+        EXISTS (
+            SELECT 1 FROM public.workouts
+            WHERE workouts.id = workout_exercises.workout_id
+            AND workouts.user_id = auth.uid()
+        )
+    );
+
+-- =====================================================
+-- TABLE 5: EXERCISE SETS
+-- =====================================================
+-- Stores individual sets for each exercise with performance data
+
+CREATE TABLE IF NOT EXISTS public.exercise_sets (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    workout_exercise_id UUID NOT NULL REFERENCES public.workout_exercises(id) ON DELETE CASCADE,
+    set_number INTEGER NOT NULL,
+    reps INTEGER,
+    weight_kg DECIMAL(10, 2),
+    duration_seconds INTEGER,
+    notes TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    CONSTRAINT valid_set_number CHECK (set_number > 0),
+    CONSTRAINT valid_reps CHECK (reps IS NULL OR reps > 0),
+    CONSTRAINT valid_weight CHECK (weight_kg IS NULL OR weight_kg >= 0),
+    CONSTRAINT valid_duration CHECK (duration_seconds IS NULL OR duration_seconds > 0)
+);
+
+COMMENT ON TABLE public.exercise_sets IS 'Individual sets with reps, weight, duration, and notes';
+COMMENT ON COLUMN public.exercise_sets.set_number IS 'Set number (1, 2, 3, etc.)';
+COMMENT ON COLUMN public.exercise_sets.reps IS 'Number of repetitions performed';
+COMMENT ON COLUMN public.exercise_sets.weight_kg IS 'Weight lifted in kilograms';
+COMMENT ON COLUMN public.exercise_sets.duration_seconds IS 'Duration in seconds (for timed exercises)';
+
+-- Enable Row Level Security
+ALTER TABLE public.exercise_sets ENABLE ROW LEVEL SECURITY;
+
+-- RLS Policies for exercise_sets
+-- Users can only access sets if they own the parent workout
+CREATE POLICY "Users can view their own exercise sets"
+    ON public.exercise_sets
+    FOR SELECT
+    USING (
+        EXISTS (
+            SELECT 1 FROM public.workout_exercises we
+            JOIN public.workouts w ON w.id = we.workout_id
+            WHERE we.id = exercise_sets.workout_exercise_id
+            AND w.user_id = auth.uid()
+        )
+    );
+
+CREATE POLICY "Users can insert their own exercise sets"
+    ON public.exercise_sets
+    FOR INSERT
+    WITH CHECK (
+        EXISTS (
+            SELECT 1 FROM public.workout_exercises we
+            JOIN public.workouts w ON w.id = we.workout_id
+            WHERE we.id = exercise_sets.workout_exercise_id
+            AND w.user_id = auth.uid()
+        )
+    );
+
+CREATE POLICY "Users can update their own exercise sets"
+    ON public.exercise_sets
+    FOR UPDATE
+    USING (
+        EXISTS (
+            SELECT 1 FROM public.workout_exercises we
+            JOIN public.workouts w ON w.id = we.workout_id
+            WHERE we.id = exercise_sets.workout_exercise_id
+            AND w.user_id = auth.uid()
+        )
+    )
+    WITH CHECK (
+        EXISTS (
+            SELECT 1 FROM public.workout_exercises we
+            JOIN public.workouts w ON w.id = we.workout_id
+            WHERE we.id = exercise_sets.workout_exercise_id
+            AND w.user_id = auth.uid()
+        )
+    );
+
+CREATE POLICY "Users can delete their own exercise sets"
+    ON public.exercise_sets
+    FOR DELETE
+    USING (
+        EXISTS (
+            SELECT 1 FROM public.workout_exercises we
+            JOIN public.workouts w ON w.id = we.workout_id
+            WHERE we.id = exercise_sets.workout_exercise_id
+            AND w.user_id = auth.uid()
+        )
+    );
+
+-- =====================================================
+-- VIEW: PERSONAL RECORDS (Auto-calculated PRs)
+-- =====================================================
+-- Calculates personal records for each exercise based on workout history
+
+CREATE OR REPLACE VIEW public.personal_records AS
+SELECT
+    e.user_id,
+    e.id AS exercise_id,
+    e.name AS exercise_name,
+    MAX(es.weight_kg) AS max_weight_kg,
+    MAX(es.reps) AS max_reps,
+    MAX(es.weight_kg * (1 + es.reps::DECIMAL / 30)) AS estimated_1rm,
+    (
+        SELECT w.workout_date
+        FROM public.exercise_sets es2
+        JOIN public.workout_exercises we2 ON we2.id = es2.workout_exercise_id
+        JOIN public.workouts w ON w.id = we2.workout_id
+        WHERE we2.exercise_id = e.id
+        AND es2.weight_kg = MAX(es.weight_kg)
+        ORDER BY w.workout_date DESC
+        LIMIT 1
+    ) AS max_weight_date,
+    COUNT(DISTINCT we.workout_id) AS total_workouts,
+    COUNT(es.id) AS total_sets
+FROM public.exercises e
+LEFT JOIN public.workout_exercises we ON we.exercise_id = e.id
+LEFT JOIN public.exercise_sets es ON es.workout_exercise_id = we.id
+GROUP BY e.user_id, e.id, e.name;
+
+COMMENT ON VIEW public.personal_records IS 'Auto-calculated personal records for each exercise';
+
+-- Note: Views inherit RLS from underlying tables, so users will only see their own PRs
+
+-- =====================================================
+-- INDEXES FOR PERFORMANCE
+-- =====================================================
+-- These indexes improve query performance for common operations
+
+-- Index for filtering by user_id (most common query pattern)
+CREATE INDEX IF NOT EXISTS idx_muscle_groups_user_id ON public.muscle_groups(user_id);
+CREATE INDEX IF NOT EXISTS idx_exercises_user_id ON public.exercises(user_id);
+CREATE INDEX IF NOT EXISTS idx_workouts_user_id ON public.workouts(user_id);
+
+-- Index for exercise lookups by muscle group
+CREATE INDEX IF NOT EXISTS idx_exercises_muscle_group_id ON public.exercises(muscle_group_id);
+
+-- Index for workout date sorting and filtering
+CREATE INDEX IF NOT EXISTS idx_workouts_workout_date ON public.workouts(workout_date DESC);
+CREATE INDEX IF NOT EXISTS idx_workouts_user_date ON public.workouts(user_id, workout_date DESC);
+
+-- Indexes for foreign key relationships
+CREATE INDEX IF NOT EXISTS idx_workout_exercises_workout_id ON public.workout_exercises(workout_id);
+CREATE INDEX IF NOT EXISTS idx_workout_exercises_exercise_id ON public.workout_exercises(exercise_id);
+CREATE INDEX IF NOT EXISTS idx_exercise_sets_workout_exercise_id ON public.exercise_sets(workout_exercise_id);
+
+-- Index for set ordering within exercises
+CREATE INDEX IF NOT EXISTS idx_exercise_sets_set_number ON public.exercise_sets(workout_exercise_id, set_number);
+
+-- =====================================================
+-- HELPER FUNCTIONS (Optional)
+-- =====================================================
+-- Function to update updated_at timestamp automatically
+
+CREATE OR REPLACE FUNCTION public.update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = NOW();
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Apply triggers to all tables with updated_at column
+CREATE TRIGGER update_muscle_groups_updated_at
+    BEFORE UPDATE ON public.muscle_groups
+    FOR EACH ROW
+    EXECUTE FUNCTION public.update_updated_at_column();
+
+CREATE TRIGGER update_exercises_updated_at
+    BEFORE UPDATE ON public.exercises
+    FOR EACH ROW
+    EXECUTE FUNCTION public.update_updated_at_column();
+
+CREATE TRIGGER update_workouts_updated_at
+    BEFORE UPDATE ON public.workouts
+    FOR EACH ROW
+    EXECUTE FUNCTION public.update_updated_at_column();
+
+CREATE TRIGGER update_workout_exercises_updated_at
+    BEFORE UPDATE ON public.workout_exercises
+    FOR EACH ROW
+    EXECUTE FUNCTION public.update_updated_at_column();
+
+CREATE TRIGGER update_exercise_sets_updated_at
+    BEFORE UPDATE ON public.exercise_sets
+    FOR EACH ROW
+    EXECUTE FUNCTION public.update_updated_at_column();
+
+-- =====================================================
+-- SCHEMA COMPLETE
+-- =====================================================
+-- This schema is ready to be executed in Supabase SQL Editor
+--
+-- Tables created:
+-- 1. muscle_groups - User-created categories
+-- 2. exercises - User-created exercises with optional categories
+-- 3. workouts - Workout sessions
+-- 4. workout_exercises - Exercises in workouts
+-- 5. exercise_sets - Individual sets with reps/weight/duration
+--
+-- Views created:
+-- 1. personal_records - Auto-calculated PRs
+--
+-- All tables have Row Level Security enabled
+-- All foreign keys use CASCADE deletes where appropriate
+-- Indexes optimize common query patterns
+-- Triggers maintain updated_at timestamps
