@@ -67,5 +67,204 @@ export default {
   errors: {
     passwordsDoNotMatch: "Passwords do not match",
     passwordTooShort: "Password must be at least 6 characters long"
+  },
+  bottomNav: {
+    workouts: "Workouts",
+    new: "New",
+    exercises: "Exercises",
+    stats: "Stats",
+    profile: "Profile"
+  },
+  workouts: {
+    title: "Workouts",
+    subtitle: "Workout history",
+    greeting: "Welcome, {name}!",
+    lastWorkout: "Last workout: {time}",
+    startWorkout: "START WORKOUT",
+    thisWeek: "This week",
+    workoutsCount: "{count} workouts",
+    totalTime: "{hours}h",
+    caloriesBurned: "{calories}k",
+    history: "Workout history",
+    viewDetails: "View details",
+    prs: "{count} PRs",
+    recentWorkouts: "Recent workouts",
+    defaultName: "Workout",
+    exercisesCount: "exercises",
+    setsCount: "sets",
+    volume: "volume",
+    weekSummary: {
+      title: "Week Summary",
+      workouts: "Workouts",
+      hours: "Hours",
+      noWorkouts: "No workouts this week yet. Time to start!",
+      greatStart: "Great start! Keep going!",
+      keepGoing: "Amazing! Keep up the great work!"
+    },
+    emptyState: {
+      title: "No workouts yet",
+      subtitle: "Start your first workout!",
+      cta: "START YOUR FIRST WORKOUT"
+    },
+    actions: {
+      delete: "Delete"
+    },
+    deleteConfirm: {
+      message: "Are you sure you want to delete workout \"{name}\"?"
+    }
+  },
+  newWorkout: {
+    title: "New Workout",
+    cancel: "Cancel",
+    ok: "OK",
+    back: "Back",
+    step1: {
+      title: "Select exercises",
+      progress: "Step 1/3",
+      search: "Search exercise...",
+      selected: "Selected ({count})",
+      yourExercises: "Your exercises",
+      addNew: "Add new exercise",
+      next: "NEXT ({count} selected)"
+    },
+    step2: {
+      title: "Log sets",
+      progress: "Step 2/3",
+      nameLabel: "Name (optional)",
+      namePlaceholder: "e.g. Upper Body A",
+      set: "Set {number}",
+      reps: "Reps",
+      weight: "Weight",
+      duration: "Duration",
+      done: "Done",
+      addSet: "Add set",
+      lastTime: "Last: {sets}×{reps} @ {weight}kg",
+      finish: "FINISH WORKOUT"
+    },
+    step3: {
+      title: "Workout completed!",
+      close: "Close",
+      summary: {
+        duration: "Duration: {minutes} min",
+        exercises: "Exercises: {count}",
+        sets: "Sets: {count}",
+        prs: "New PRs: {count}"
+      },
+      notesLabel: "Notes (optional)",
+      notesPlaceholder: "How did you feel? Notes...",
+      newRecords: "New records!",
+      recordLine: "{exercise}: {weight}kg ({reps} reps)",
+      previousPR: "Previous PR: {weight}kg",
+      backHome: "BACK TO HOME",
+      share: "SHARE"
+    }
+  },
+  exercises: {
+    title: "Exercises",
+    search: "Search exercise...",
+    count: "You have {count} exercises",
+    categoryAll: "All",
+    pr: "PR: {weight}kg @ {reps} reps",
+    lastUsed: "Last used: {time}",
+    workoutsCount: "{count} workouts",
+    actions: {
+      edit: "Edit",
+      stats: "Stats",
+      delete: "Delete"
+    },
+    addModal: {
+      title: "New exercise",
+      cancel: "Cancel",
+      nameLabel: "Name",
+      namePlaceholder: "e.g. Bench Press",
+      muscleGroupLabel: "Muscle group (optional)",
+      muscleGroupPlaceholder: "Select category",
+      descriptionLabel: "Description (optional)",
+      descriptionPlaceholder: "Exercise description...",
+      submit: "ADD EXERCISE"
+    },
+    emptyState: {
+      title: "No exercises yet",
+      subtitle: "Add your first exercise!",
+      cta: "ADD EXERCISE"
+    },
+    deleteConfirm: {
+      title: "Delete exercise?",
+      message: "Are you sure you want to delete \"{name}\"? Your workout history with this exercise will be preserved.",
+      cancel: "Cancel",
+      confirm: "Delete"
+    }
+  },
+  stats: {
+    title: "Statistics",
+    activity: {
+      title: "Activity",
+      streak: "Streak",
+      workouts: "Workouts",
+      totalTime: "Total time",
+      days: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+    },
+    prs: {
+      title: "Personal Records",
+      at: "@",
+      reps: "reps",
+      ago: "{time} ago",
+      viewDetails: "View details"
+    },
+    detail: {
+      personalRecord: "Personal Record",
+      achieved: "Achieved: {date}",
+      improvement: "+{diff}kg from previous PR",
+      progress: "Progress (last 3 months)",
+      statistics: "Statistics",
+      totalVolume: "Total volume:",
+      avgWeight: "Average weight:",
+      workoutsCount: "Number of workouts:",
+      lastWorkout: "Last workout:",
+      recordHistory: "Record history"
+    },
+    timeRange: {
+      week: "Last 7 days",
+      month: "Last 30 days",
+      threeMonths: "3 months",
+      year: "Year",
+      all: "All time"
+    },
+    emptyState: {
+      title: "No data yet",
+      subtitle: "Complete your first workout to see your stats and records!",
+      cta: "START WORKOUT"
+    }
+  },
+  profile: {
+    title: "Profile",
+    back: "Back",
+    memberSince: "Member since: {date}",
+    settings: {
+      title: "Settings",
+      language: "Language",
+      units: "Weight units",
+      unitsKg: "Kilograms (kg)",
+      unitsLbs: "Pounds (lbs)",
+      darkMode: "Dark mode",
+      darkModeAlways: "Always on"
+    },
+    categories: {
+      title: "Categories",
+      manage: "Manage muscle groups",
+      add: "Add category",
+      deleteConfirm: "Delete category \"{name}\"?",
+      deleteError: "Cannot delete category with assigned exercises"
+    },
+    data: {
+      title: "Data",
+      export: "Export data to CSV",
+      deleteAll: "Delete all data",
+      deleteConfirm: "Are you sure you want to delete ALL data? This action cannot be undone!",
+      deleteSuccess: "Data has been deleted"
+    },
+    logout: "SIGN OUT",
+    logoutConfirm: "Are you sure you want to sign out?",
+    version: "v1.0.0"
   }
 }

@@ -14,9 +14,9 @@ function LoginPage() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    // Redirect to dashboard if user is already logged in
+    // Redirect to workouts if user is already logged in
     if (!authLoading && user) {
-      navigate('/dashboard', { replace: true })
+      navigate('/workouts', { replace: true })
     }
   }, [user, authLoading, navigate])
 
@@ -31,7 +31,7 @@ function LoginPage() {
       setError(signInError.message)
       setLoading(false)
     } else {
-      navigate('/dashboard')
+      navigate('/workouts')
     }
   }
 

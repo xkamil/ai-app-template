@@ -16,8 +16,7 @@
 ### Założenia
 - **Mobile-first**: Aplikacja projektowana najpierw dla urządzeń mobilnych (320px - 428px)
 - **Dark mode fitness**: Ciemny motyw z energetycznymi akcentami kolorystycznymi
-- **Progressive Web App**: Możliwość instalacji jako PWA
-- **Offline-first**: Podstawowe funkcje działające offline (opcjonalnie w przyszłości)
+- **Baza danych z supabase**: Połącz z istniejąca bazą danych w supabase której schemat jest w database/schema.sql
 - **Dwujęzyczność**: Polski i angielski (rozszerzenie istniejącego systemu i18n)
 
 ### Cel aplikacji
