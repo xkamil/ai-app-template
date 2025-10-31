@@ -22,8 +22,12 @@ export const WorkoutPlanProvider = ({ children }) => {
 
   // Fetch workout plans with exercises
   const fetchWorkoutPlans = async () => {
-    if (!user) return;
+    if (!user) {
+      console.log('WorkoutPlanContext: No user found, skipping fetch');
+      return;
+    }
 
+    console.log('WorkoutPlanContext: Fetching workout plans for user:', user.id, user.email);
     setLoading(true);
     setError(null);
 
@@ -37,10 +41,13 @@ export const WorkoutPlanProvider = ({ children }) => {
             order_index,
             suggested_sets,
             notes,
-            exercise:exercises(id, name, muscle_group_id)
+            exercise:exercises(id, name, description)
           )
         `)
+        .eq('user_id', user.id)
         .order('created_at', { ascending: false });
+
+      console.log('WorkoutPlanContext: Query result:', { data, error });
 
       if (error) throw error;
 
@@ -50,6 +57,7 @@ export const WorkoutPlanProvider = ({ children }) => {
         workout_plan_exercises: plan.workout_plan_exercises.sort((a, b) => a.order_index - b.order_index)
       }));
 
+      console.log('WorkoutPlanContext: Setting workout plans:', plansWithSortedExercises);
       setWorkoutPlans(plansWithSortedExercises || []);
     } catch (err) {
       console.error('Error fetching workout plans:', err);

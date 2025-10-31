@@ -14,6 +14,11 @@ const WorkoutPlansPage = () => {
   const [showModal, setShowModal] = useState(false);
   const [editingPlan, setEditingPlan] = useState(null);
 
+  // Debug logging
+  console.log('WorkoutPlansPage: workoutPlans:', workoutPlans);
+  console.log('WorkoutPlansPage: loading:', loading);
+  console.log('WorkoutPlansPage: workoutPlans.length:', workoutPlans?.length);
+
   const handleCreatePlan = () => {
     setEditingPlan(null);
     setShowModal(true);
