@@ -9,7 +9,7 @@ import WorkoutPlanModal from '../components/WorkoutPlanModal';
 const WorkoutPlansPage = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
-  const { workoutPlans, loading, createWorkoutPlan, updateWorkoutPlan, deleteWorkoutPlan } = useWorkoutPlan();
+  const { workoutPlans, loading, createWorkoutPlan, updateWorkoutPlan, deleteWorkoutPlan, clonePlan } = useWorkoutPlan();
 
   const [showModal, setShowModal] = useState(false);
   const [editingPlan, setEditingPlan] = useState(null);
@@ -35,6 +35,13 @@ const WorkoutPlansPage = () => {
       if (result.error) {
         alert(t('plans.deleteError'));
       }
+    }
+  };
+
+  const handleClonePlan = async (plan) => {
+    const result = await clonePlan(plan);
+    if (result.error) {
+      alert(t('plans.cloneError'));
     }
   };
 
@@ -139,6 +146,7 @@ const WorkoutPlansPage = () => {
                 onEdit={handleEditPlan}
                 onDelete={handleDeletePlan}
                 onSelect={handleStartWorkout}
+                onClone={handleClonePlan}
               />
             ))}
           </>

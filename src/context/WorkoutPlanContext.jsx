@@ -191,6 +191,52 @@ export const WorkoutPlanProvider = ({ children }) => {
     }
   };
 
+  // Clone workout plan
+  const clonePlan = async (plan) => {
+    if (!user) return { error: 'User not authenticated' };
+
+    try {
+      // 1. Create the cloned workout plan with modified name
+      const { data: clonedPlan, error: planError } = await supabase
+        .from('workout_plans')
+        .insert([{
+          user_id: user.id,
+          name: `${plan.name} (kopia)`,
+          color: plan.color || '#FF6B35',
+          description: plan.description || null
+        }])
+        .select()
+        .single();
+
+      if (planError) throw planError;
+
+      // 2. Clone all exercises from the original plan
+      if (plan.workout_plan_exercises && plan.workout_plan_exercises.length > 0) {
+        const exercisesToInsert = plan.workout_plan_exercises.map(pe => ({
+          workout_plan_id: clonedPlan.id,
+          exercise_id: pe.exercise_id,
+          order_index: pe.order_index,
+          suggested_sets: pe.suggested_sets || 3,
+          notes: pe.notes || null
+        }));
+
+        const { error: exercisesError } = await supabase
+          .from('workout_plan_exercises')
+          .insert(exercisesToInsert);
+
+        if (exercisesError) throw exercisesError;
+      }
+
+      // 3. Refresh workout plans list
+      await fetchWorkoutPlans();
+
+      return { data: clonedPlan, error: null };
+    } catch (err) {
+      console.error('Error cloning workout plan:', err);
+      return { error: err.message };
+    }
+  };
+
   // Get suggested sets for an exercise based on PRs
   const getSuggestedSetsForExercise = (exerciseId, suggestedSetCount = 3) => {
     const personalRecords = getPersonalRecords();
@@ -251,6 +297,7 @@ export const WorkoutPlanProvider = ({ children }) => {
     createWorkoutPlan,
     updateWorkoutPlan,
     deleteWorkoutPlan,
+    clonePlan,
     getSuggestedSetsForExercise,
     refetchWorkoutPlans: fetchWorkoutPlans
   };

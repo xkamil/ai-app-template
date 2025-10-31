@@ -1,12 +1,20 @@
+import { useState } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 
-const WorkoutPlanCard = ({ plan, onEdit, onDelete, onSelect }) => {
+const WorkoutPlanCard = ({ plan, onEdit, onDelete, onSelect, onClone }) => {
   const { t } = useLanguage();
+  const [isExpanded, setIsExpanded] = useState(false);
 
-  const handleCardClick = () => {
+  const handleStartWorkout = (e) => {
+    e.stopPropagation();
     if (onSelect) {
       onSelect(plan);
     }
+  };
+
+  const handleToggleExpand = (e) => {
+    e.stopPropagation();
+    setIsExpanded(!isExpanded);
   };
 
   const handleEditClick = (e) => {
@@ -23,153 +31,233 @@ const WorkoutPlanCard = ({ plan, onEdit, onDelete, onSelect }) => {
     }
   };
 
+  const handleCloneClick = (e) => {
+    e.stopPropagation();
+    if (onClone) {
+      onClone(plan);
+    }
+  };
+
   return (
     <div
       className="dark-card"
-      onClick={handleCardClick}
       style={{
         marginBottom: 'var(--space-3)',
-        cursor: onSelect ? 'pointer' : 'default',
         transition: 'all var(--transition-base)',
         borderLeft: `4px solid ${plan.color || '#FF6B35'}`
       }}
-      onMouseEnter={(e) => {
-        if (onSelect) {
-          e.currentTarget.style.transform = 'translateY(-2px)';
-          e.currentTarget.style.boxShadow = 'var(--shadow-md)';
-        }
-      }}
-      onMouseLeave={(e) => {
-        if (onSelect) {
-          e.currentTarget.style.transform = 'translateY(0)';
-          e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
-        }
-      }}
     >
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-        <div style={{ flex: 1 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-2)' }}>
-            <div
-              style={{
-                width: '12px',
-                height: '12px',
-                borderRadius: '50%',
-                backgroundColor: plan.color || '#FF6B35'
-              }}
-            />
-            <h4 style={{
-              fontSize: 'var(--text-lg)',
-              fontWeight: 'var(--font-semibold)',
-              color: 'var(--text-primary)',
-              margin: 0
-            }}>
-              {plan.name}
-            </h4>
-          </div>
+      {/* Header Section */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-2)' }}>
+        <div
+          style={{
+            width: '12px',
+            height: '12px',
+            borderRadius: '50%',
+            backgroundColor: plan.color || '#FF6B35'
+          }}
+        />
+        <h4 style={{
+          fontSize: 'var(--text-lg)',
+          fontWeight: 'var(--font-semibold)',
+          color: 'var(--text-primary)',
+          margin: 0,
+          flex: 1
+        }}>
+          {plan.name}
+        </h4>
+      </div>
 
-          {plan.description && (
-            <p style={{
-              fontSize: 'var(--text-sm)',
-              color: 'var(--text-secondary)',
-              marginBottom: 'var(--space-2)'
-            }}>
-              {plan.description}
-            </p>
-          )}
+      {/* Description */}
+      {plan.description && (
+        <p style={{
+          fontSize: 'var(--text-sm)',
+          color: 'var(--text-secondary)',
+          marginBottom: 'var(--space-2)'
+        }}>
+          {plan.description}
+        </p>
+      )}
 
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 'var(--space-3)',
-            fontSize: 'var(--text-sm)',
-            color: 'var(--text-tertiary)'
-          }}>
-            <span>
-              💪 {plan.workout_plan_exercises?.length || 0} {t('plans.exercises')}
-            </span>
-            {plan.workout_plan_exercises && plan.workout_plan_exercises.length > 0 && (
-              <span>
-                📋 {plan.workout_plan_exercises.reduce((sum, e) => sum + (e.suggested_sets || 0), 0)} {t('plans.sets')}
-              </span>
-            )}
-          </div>
-        </div>
-
-        {(onEdit || onDelete) && (
-          <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
-            {onEdit && (
-              <button
-                onClick={handleEditClick}
-                style={{
-                  padding: 'var(--space-2)',
-                  background: 'transparent',
-                  border: 'none',
-                  color: 'var(--text-secondary)',
-                  fontSize: 'var(--text-lg)',
-                  cursor: 'pointer',
-                  transition: 'color var(--transition-fast)'
-                }}
-                onMouseEnter={(e) => e.target.style.color = 'var(--accent-primary)'}
-                onMouseLeave={(e) => e.target.style.color = 'var(--text-secondary)'}
-              >
-                ✏️
-              </button>
-            )}
-            {onDelete && (
-              <button
-                onClick={handleDeleteClick}
-                style={{
-                  padding: 'var(--space-2)',
-                  background: 'transparent',
-                  border: 'none',
-                  color: 'var(--text-secondary)',
-                  fontSize: 'var(--text-lg)',
-                  cursor: 'pointer',
-                  transition: 'color var(--transition-fast)'
-                }}
-                onMouseEnter={(e) => e.target.style.color = 'var(--danger)'}
-                onMouseLeave={(e) => e.target.style.color = 'var(--text-secondary)'}
-              >
-                🗑️
-              </button>
-            )}
-          </div>
+      {/* Stats */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 'var(--space-3)',
+        fontSize: 'var(--text-sm)',
+        color: 'var(--text-tertiary)',
+        marginBottom: 'var(--space-3)'
+      }}>
+        <span>
+          💪 {plan.workout_plan_exercises?.length || 0} {t('plans.exercises')}
+        </span>
+        {plan.workout_plan_exercises && plan.workout_plan_exercises.length > 0 && (
+          <span>
+            📋 {plan.workout_plan_exercises.reduce((sum, e) => sum + (e.suggested_sets || 0), 0)} {t('plans.sets')}
+          </span>
         )}
       </div>
 
-      {/* Exercise List Preview */}
-      {plan.workout_plan_exercises && plan.workout_plan_exercises.length > 0 && (
-        <div style={{ marginTop: 'var(--space-3)', paddingTop: 'var(--space-3)', borderTop: '1px solid var(--border-color)' }}>
-          {plan.workout_plan_exercises.slice(0, 3).map((planExercise, index) => (
-            <div
-              key={planExercise.id}
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                padding: 'var(--space-1) 0',
+      {/* Action Buttons - Always Visible */}
+      <div style={{ display: 'flex', gap: 'var(--space-2)', marginBottom: isExpanded ? 'var(--space-3)' : 0 }}>
+        <button
+          onClick={handleStartWorkout}
+          className="gradient-button"
+          style={{ flex: 1 }}
+        >
+          🏋️ {t('plans.startWorkout')}
+        </button>
+        <button
+          onClick={handleToggleExpand}
+          style={{
+            padding: 'var(--space-3)',
+            background: 'var(--bg-tertiary)',
+            border: '1px solid var(--border-color)',
+            borderRadius: 'var(--radius-md)',
+            color: 'var(--text-primary)',
+            fontSize: 'var(--text-base)',
+            cursor: 'pointer',
+            minWidth: '50px',
+            transition: 'all var(--transition-fast)'
+          }}
+          onMouseEnter={(e) => {
+            e.target.style.background = 'var(--bg-secondary)';
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.background = 'var(--bg-tertiary)';
+          }}
+        >
+          {isExpanded ? '▲' : '▼'}
+        </button>
+      </div>
+
+      {/* Expanded Details */}
+      {isExpanded && (
+        <div style={{
+          marginTop: 'var(--space-3)',
+          paddingTop: 'var(--space-3)',
+          borderTop: '1px solid var(--border-color)'
+        }}>
+          {/* Full Exercise List */}
+          {plan.workout_plan_exercises && plan.workout_plan_exercises.length > 0 && (
+            <div style={{ marginBottom: 'var(--space-3)' }}>
+              <h5 style={{
                 fontSize: 'var(--text-sm)',
-                color: 'var(--text-secondary)'
-              }}
-            >
-              <span>
-                {index + 1}. {planExercise.exercise?.name || 'Unknown'}
-              </span>
-              <span style={{ color: 'var(--text-tertiary)' }}>
-                {planExercise.suggested_sets || 3} {t('plans.sets')}
-              </span>
-            </div>
-          ))}
-          {plan.workout_plan_exercises.length > 3 && (
-            <div style={{
-              fontSize: 'var(--text-xs)',
-              color: 'var(--text-tertiary)',
-              marginTop: 'var(--space-1)',
-              textAlign: 'center'
-            }}>
-              +{plan.workout_plan_exercises.length - 3} {t('plans.more')}
+                fontWeight: 'var(--font-semibold)',
+                color: 'var(--text-secondary)',
+                marginBottom: 'var(--space-2)',
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em'
+              }}>
+                {t('plans.exerciseList')}
+              </h5>
+              {plan.workout_plan_exercises.map((planExercise, index) => (
+                <div
+                  key={planExercise.id}
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: 'var(--space-2)',
+                    backgroundColor: 'var(--bg-tertiary)',
+                    borderRadius: 'var(--radius-sm)',
+                    marginBottom: 'var(--space-2)',
+                    fontSize: 'var(--text-sm)',
+                    color: 'var(--text-primary)'
+                  }}
+                >
+                  <span>
+                    {index + 1}. {planExercise.exercise?.name || 'Unknown'}
+                  </span>
+                  <span style={{ color: 'var(--text-tertiary)' }}>
+                    {planExercise.suggested_sets || 3} {t('plans.sets')}
+                  </span>
+                </div>
+              ))}
             </div>
           )}
+
+          {/* Management Buttons */}
+          <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
+            <button
+              onClick={handleEditClick}
+              style={{
+                flex: 1,
+                minWidth: '120px',
+                padding: 'var(--space-2) var(--space-3)',
+                background: 'transparent',
+                border: '1px solid var(--accent-primary)',
+                borderRadius: 'var(--radius-md)',
+                color: 'var(--accent-primary)',
+                fontSize: 'var(--text-sm)',
+                fontWeight: 'var(--font-semibold)',
+                cursor: 'pointer',
+                transition: 'all var(--transition-fast)'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.background = 'var(--accent-primary)';
+                e.target.style.color = 'white';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.background = 'transparent';
+                e.target.style.color = 'var(--accent-primary)';
+              }}
+            >
+              ✏️ {t('plans.edit')}
+            </button>
+            <button
+              onClick={handleCloneClick}
+              style={{
+                flex: 1,
+                minWidth: '120px',
+                padding: 'var(--space-2) var(--space-3)',
+                background: 'transparent',
+                border: '1px solid var(--text-secondary)',
+                borderRadius: 'var(--radius-md)',
+                color: 'var(--text-secondary)',
+                fontSize: 'var(--text-sm)',
+                fontWeight: 'var(--font-semibold)',
+                cursor: 'pointer',
+                transition: 'all var(--transition-fast)'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.background = 'var(--text-secondary)';
+                e.target.style.color = 'var(--bg-primary)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.background = 'transparent';
+                e.target.style.color = 'var(--text-secondary)';
+              }}
+            >
+              📋 {t('plans.clone')}
+            </button>
+            <button
+              onClick={handleDeleteClick}
+              style={{
+                flex: 1,
+                minWidth: '120px',
+                padding: 'var(--space-2) var(--space-3)',
+                background: 'transparent',
+                border: '1px solid var(--danger)',
+                borderRadius: 'var(--radius-md)',
+                color: 'var(--danger)',
+                fontSize: 'var(--text-sm)',
+                fontWeight: 'var(--font-semibold)',
+                cursor: 'pointer',
+                transition: 'all var(--transition-fast)'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.background = 'var(--danger)';
+                e.target.style.color = 'white';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.background = 'transparent';
+                e.target.style.color = 'var(--danger)';
+              }}
+            >
+              🗑️ {t('plans.delete')}
+            </button>
+          </div>
         </div>
       )}
     </div>
