@@ -61,7 +61,7 @@ const WorkoutCard = ({ workout, onDelete }) => {
                 display: 'flex',
                 alignItems: 'center',
                 gap: 'var(--space-1)',
-                padding: '4px 8px',
+                padding: '6px 10px',
                 background: 'var(--bg-tertiary)',
                 borderRadius: 'var(--radius-sm)',
                 borderLeft: `3px solid ${workout.workout_plan.color || '#FF6B35'}`
@@ -75,7 +75,7 @@ const WorkoutCard = ({ workout, onDelete }) => {
                   }}
                 />
                 <span style={{
-                  fontSize: 'var(--text-xs)',
+                  fontSize: 'var(--text-sm)',
                   color: 'var(--text-secondary)',
                   fontWeight: 'var(--font-medium)'
                 }}>
@@ -97,15 +97,9 @@ const WorkoutCard = ({ workout, onDelete }) => {
           <p style={{
             fontSize: 'var(--text-sm)',
             color: 'var(--text-secondary)',
-            margin: 0,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 'var(--space-2)'
+            margin: 0
           }}>
-            <span>📅 {formatDate(workout.workout_date)} • ⏰ {formatTime(workout.workout_date)}</span>
-            <span style={{ marginLeft: 'auto', fontSize: 'var(--text-base)' }}>
-              {isExpanded ? '▲' : '▼'}
-            </span>
+            📅 {formatDate(workout.workout_date)} • ⏰ {formatTime(workout.workout_date)}
           </p>
         </div>
       </div>
