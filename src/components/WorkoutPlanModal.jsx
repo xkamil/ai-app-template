@@ -10,19 +10,17 @@ const WorkoutPlanModal = ({ isOpen, onClose, onSave, editingPlan }) => {
   const [planColor, setPlanColor] = useState('#FF6B35');
   const [planDescription, setPlanDescription] = useState('');
   const [selectedExercises, setSelectedExercises] = useState([]);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [draggedIndex, setDraggedIndex] = useState(null);
 
   const predefinedColors = [
     '#FF6B35', // Orange
-    '#F7931E', // Gold
     '#4ECDC4', // Turquoise
-    '#95E1D3', // Mint
     '#FF6F91', // Pink
-    '#C44569', // Dark Pink
     '#F8B500', // Yellow
     '#5F27CD', // Purple
     '#00D2FF', // Sky Blue
-    '#48C9B0'  // Aqua
+    '#48C9B0', // Aqua
+    '#C44569'  // Dark Pink
   ];
 
   useEffect(() => {
@@ -78,21 +76,71 @@ const WorkoutPlanModal = ({ isOpen, onClose, onSave, editingPlan }) => {
 
   const handleUpdateSets = (exerciseId, sets) => {
     setSelectedExercises(prev =>
-      prev.map(e => e.exercise_id === exerciseId ? { ...e, suggested_sets: parseInt(sets) || 3 } : e)
+      prev.map(e => e.exercise_id === exerciseId ? { ...e, suggested_sets: parseInt(sets) || 1 } : e)
     );
   };
 
-  const handleMoveExercise = (index, direction) => {
-    const newIndex = direction === 'up' ? index - 1 : index + 1;
-    if (newIndex < 0 || newIndex >= selectedExercises.length) return;
+  const handleIncreaseSets = (exerciseId) => {
+    setSelectedExercises(prev =>
+      prev.map(e => e.exercise_id === exerciseId ? { ...e, suggested_sets: (e.suggested_sets || 3) + 1 } : e)
+    );
+  };
+
+  const handleDecreaseSets = (exerciseId) => {
+    setSelectedExercises(prev =>
+      prev.map(e => e.exercise_id === exerciseId ? { ...e, suggested_sets: Math.max(1, (e.suggested_sets || 3) - 1) } : e)
+    );
+  };
+
+  const handleDragStart = (e, index) => {
+    setDraggedIndex(index);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  const handleDrop = (e, dropIndex) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (draggedIndex === null || draggedIndex === dropIndex) {
+      setDraggedIndex(null);
+      return;
+    }
 
     const newExercises = [...selectedExercises];
-    [newExercises[index], newExercises[newIndex]] = [newExercises[newIndex], newExercises[index]];
+    const draggedItem = newExercises[draggedIndex];
+
+    // Remove from old position
+    newExercises.splice(draggedIndex, 1);
+    // Insert at new position
+    newExercises.splice(dropIndex, 0, draggedItem);
 
     // Update order_index
     newExercises.forEach((e, i) => e.order_index = i);
 
     setSelectedExercises(newExercises);
+    setDraggedIndex(null);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedIndex(null);
+  };
+
+  const handleSelectExercise = (e) => {
+    const exerciseId = e.target.value;
+    if (!exerciseId) return;
+
+    const exercise = exercises.find(ex => ex.id === exerciseId);
+    if (exercise) {
+      handleAddExercise(exercise);
+    }
+
+    // Reset select
+    e.target.value = '';
   };
 
   const handleSave = () => {
@@ -121,12 +169,10 @@ const WorkoutPlanModal = ({ isOpen, onClose, onSave, editingPlan }) => {
     setPlanColor('#FF6B35');
     setPlanDescription('');
     setSelectedExercises([]);
-    setSearchQuery('');
     onClose();
   };
 
-  const filteredExercises = exercises.filter(ex =>
-    ex.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
+  const availableExercises = exercises.filter(ex =>
     !selectedExercises.find(se => se.exercise_id === ex.id)
   );
 
@@ -229,60 +275,69 @@ const WorkoutPlanModal = ({ isOpen, onClose, onSave, editingPlan }) => {
               {selectedExercises.map((se, index) => (
                 <div
                   key={se.exercise_id}
+                  draggable={true}
+                  onDragStart={(e) => handleDragStart(e, index)}
+                  onDragOver={handleDragOver}
+                  onDrop={(e) => handleDrop(e, index)}
+                  onDragEnd={handleDragEnd}
                   style={{
                     display: 'flex',
                     alignItems: 'center',
                     gap: 'var(--space-2)',
                     padding: 'var(--space-2)',
-                    backgroundColor: 'var(--bg-tertiary)',
+                    backgroundColor: draggedIndex === index ? 'var(--bg-secondary)' : 'var(--bg-tertiary)',
                     borderRadius: 'var(--radius-md)',
-                    marginBottom: 'var(--space-2)'
+                    marginBottom: 'var(--space-2)',
+                    cursor: draggedIndex === index ? 'grabbing' : 'grab',
+                    opacity: draggedIndex === index ? 0.5 : 1,
+                    transition: 'background var(--transition-fast), opacity var(--transition-fast)',
+                    border: draggedIndex === index ? '2px dashed var(--accent-primary)' : 'none'
                   }}
                 >
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    <button
-                      onClick={() => handleMoveExercise(index, 'up')}
-                      disabled={index === 0}
-                      style={{
-                        background: 'transparent',
-                        border: 'none',
-                        color: index === 0 ? 'var(--text-tertiary)' : 'var(--text-secondary)',
-                        cursor: index === 0 ? 'default' : 'pointer',
-                        fontSize: '12px',
-                        padding: '0'
-                      }}
-                    >
-                      ▲
-                    </button>
-                    <button
-                      onClick={() => handleMoveExercise(index, 'down')}
-                      disabled={index === selectedExercises.length - 1}
-                      style={{
-                        background: 'transparent',
-                        border: 'none',
-                        color: index === selectedExercises.length - 1 ? 'var(--text-tertiary)' : 'var(--text-secondary)',
-                        cursor: index === selectedExercises.length - 1 ? 'default' : 'pointer',
-                        fontSize: '12px',
-                        padding: '0'
-                      }}
-                    >
-                      ▼
-                    </button>
+                  {/* Drag handle */}
+                  <div style={{
+                    color: 'var(--text-tertiary)',
+                    fontSize: '16px',
+                    cursor: 'grab',
+                    userSelect: 'none'
+                  }}>
+                    ⋮⋮
                   </div>
 
                   <span style={{ flex: 1, fontSize: 'var(--text-sm)', color: 'var(--text-primary)' }}>
                     {index + 1}. {se.exercise?.name}
                   </span>
 
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)' }}>
+                  {/* Sets control with +/- buttons */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <button
+                      onClick={() => handleDecreaseSets(se.exercise_id)}
+                      disabled={se.suggested_sets <= 1}
+                      style={{
+                        width: '28px',
+                        height: '28px',
+                        padding: '0',
+                        backgroundColor: 'var(--bg-primary)',
+                        border: '1px solid var(--border-color)',
+                        borderRadius: 'var(--radius-sm)',
+                        color: se.suggested_sets <= 1 ? 'var(--text-tertiary)' : 'var(--text-primary)',
+                        fontSize: 'var(--text-sm)',
+                        cursor: se.suggested_sets <= 1 ? 'not-allowed' : 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}
+                    >
+                      −
+                    </button>
                     <input
                       type="number"
                       min="1"
-                      max="10"
                       value={se.suggested_sets}
                       onChange={(e) => handleUpdateSets(se.exercise_id, e.target.value)}
                       style={{
-                        width: '50px',
+                        width: '40px',
+                        height: '28px',
                         padding: '4px',
                         backgroundColor: 'var(--bg-primary)',
                         border: '1px solid var(--border-color)',
@@ -292,7 +347,26 @@ const WorkoutPlanModal = ({ isOpen, onClose, onSave, editingPlan }) => {
                         textAlign: 'center'
                       }}
                     />
-                    <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)' }}>
+                    <button
+                      onClick={() => handleIncreaseSets(se.exercise_id)}
+                      style={{
+                        width: '28px',
+                        height: '28px',
+                        padding: '0',
+                        backgroundColor: 'var(--bg-primary)',
+                        border: '1px solid var(--border-color)',
+                        borderRadius: 'var(--radius-sm)',
+                        color: 'var(--text-primary)',
+                        fontSize: 'var(--text-sm)',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}
+                    >
+                      +
+                    </button>
+                    <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)', marginLeft: '4px' }}>
                       {t('plans.sets')}
                     </span>
                   </div>
@@ -327,55 +401,27 @@ const WorkoutPlanModal = ({ isOpen, onClose, onSave, editingPlan }) => {
             </div>
           )}
 
-          {/* Search and Add Exercises */}
-          <input
-            type="text"
+          {/* Add Exercise with Select */}
+          <select
+            onChange={handleSelectExercise}
             className="dark-input"
-            placeholder={t('plans.modal.searchExercises')}
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            style={{ fontSize: 'var(--text-sm)', marginBottom: 'var(--space-2)' }}
-          />
-
-          {searchQuery && (
-            <div style={{
-              maxHeight: '200px',
-              overflowY: 'auto',
-              backgroundColor: 'var(--bg-tertiary)',
-              borderRadius: 'var(--radius-md)',
-              padding: 'var(--space-2)'
-            }}>
-              {filteredExercises.length > 0 ? (
-                filteredExercises.map(exercise => (
-                  <button
-                    key={exercise.id}
-                    onClick={() => handleAddExercise(exercise)}
-                    style={{
-                      width: '100%',
-                      padding: 'var(--space-2)',
-                      textAlign: 'left',
-                      background: 'transparent',
-                      border: 'none',
-                      color: 'var(--text-primary)',
-                      fontSize: 'var(--text-sm)',
-                      cursor: 'pointer',
-                      borderRadius: 'var(--radius-sm)',
-                      marginBottom: '4px',
-                      transition: 'background var(--transition-fast)'
-                    }}
-                    onMouseEnter={(e) => e.target.style.background = 'var(--bg-secondary)'}
-                    onMouseLeave={(e) => e.target.style.background = 'transparent'}
-                  >
-                    + {exercise.name}
-                  </button>
-                ))
-              ) : (
-                <div style={{ padding: 'var(--space-2)', textAlign: 'center', color: 'var(--text-tertiary)', fontSize: 'var(--text-sm)' }}>
-                  {t('plans.modal.noResults')}
-                </div>
-              )}
-            </div>
-          )}
+            style={{
+              fontSize: 'var(--text-sm)',
+              width: '100%',
+              padding: 'var(--space-2)',
+              cursor: 'pointer'
+            }}
+            value=""
+          >
+            <option value="" disabled>
+              {t('plans.modal.selectExercise')}
+            </option>
+            {availableExercises.map(exercise => (
+              <option key={exercise.id} value={exercise.id}>
+                {exercise.name}
+              </option>
+            ))}
+          </select>
         </div>
 
         {/* Action Buttons */}

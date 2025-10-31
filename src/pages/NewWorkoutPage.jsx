@@ -55,8 +55,8 @@ const NewWorkoutPage = () => {
       exercises: newExercises
     });
 
-    // Move to exercise selection step
-    setStep(1);
+    // Skip exercise selection and go directly to logging sets
+    setStep(2);
   };
 
   // Load plan from URL if planId is provided (skip plan selection)

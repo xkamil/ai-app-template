@@ -1,13 +1,15 @@
 import { useState } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 
-const LogSetsStep = ({ selectedExercises, workoutData, onUpdateWorkoutData, onBack, onFinish }) => {
+const LogSetsStep = ({ selectedExercises, workoutData, onUpdateWorkoutData, onBack, onFinish, onCancel }) => {
   const { t } = useLanguage();
   const [workoutName, setWorkoutName] = useState(workoutData.name || '');
   const [currentExerciseIndex, setCurrentExerciseIndex] = useState(0);
+  const [exerciseStatus, setExerciseStatus] = useState({}); // { exerciseId: 'completed' | 'skipped' | null }
 
   const currentExercise = selectedExercises[currentExerciseIndex];
   const exerciseSets = workoutData.exercises[currentExercise.id]?.sets || [{ reps: '', weight_kg: '', duration_seconds: '', notes: '' }];
+  const currentStatus = exerciseStatus[currentExercise.id];
 
   const updateSet = (setIndex, field, value) => {
     const updatedSets = [...exerciseSets];
