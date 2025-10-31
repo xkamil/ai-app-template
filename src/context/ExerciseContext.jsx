@@ -15,29 +15,10 @@ export const useExercise = () => {
 export const ExerciseProvider = ({ children }) => {
   const { user } = useAuth();
   const [exercises, setExercises] = useState([]);
-  const [muscleGroups, setMuscleGroups] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Fetch muscle groups
-  const fetchMuscleGroups = async () => {
-    if (!user) return;
-
-    try {
-      const { data, error } = await supabase
-        .from('muscle_groups')
-        .select('*')
-        .order('name');
-
-      if (error) throw error;
-      setMuscleGroups(data || []);
-    } catch (err) {
-      console.error('Error fetching muscle groups:', err);
-      setError(err.message);
-    }
-  };
-
-  // Fetch exercises with muscle group info
+  // Fetch exercises
   const fetchExercises = async () => {
     if (!user) return;
 
@@ -47,10 +28,7 @@ export const ExerciseProvider = ({ children }) => {
     try {
       const { data, error } = await supabase
         .from('exercises')
-        .select(`
-          *,
-          muscle_group:muscle_groups(id, name)
-        `)
+        .select('*')
         .order('name');
 
       if (error) throw error;
@@ -73,13 +51,9 @@ export const ExerciseProvider = ({ children }) => {
         .insert([{
           user_id: user.id,
           name: exerciseData.name,
-          muscle_group_id: exerciseData.muscleGroupId || null,
           description: exerciseData.description || null
         }])
-        .select(`
-          *,
-          muscle_group:muscle_groups(id, name)
-        `);
+        .select('*');
 
       if (error) throw error;
 
@@ -102,14 +76,10 @@ export const ExerciseProvider = ({ children }) => {
         .from('exercises')
         .update({
           name: exerciseData.name,
-          muscle_group_id: exerciseData.muscleGroupId || null,
           description: exerciseData.description || null
         })
         .eq('id', id)
-        .select(`
-          *,
-          muscle_group:muscle_groups(id, name)
-        `);
+        .select('*');
 
       if (error) throw error;
 
@@ -147,73 +117,24 @@ export const ExerciseProvider = ({ children }) => {
     }
   };
 
-  // Add muscle group
-  const addMuscleGroup = async (name, description = null) => {
-    if (!user) return { error: 'User not authenticated' };
-
-    try {
-      const { data, error } = await supabase
-        .from('muscle_groups')
-        .insert([{ user_id: user.id, name, description }])
-        .select();
-
-      if (error) throw error;
-
-      // Add to local state
-      setMuscleGroups(prev => [...prev, data[0]].sort((a, b) => a.name.localeCompare(b.name)));
-
-      return { data: data[0], error: null };
-    } catch (err) {
-      console.error('Error adding muscle group:', err);
-      return { error: err.message };
-    }
-  };
-
-  // Delete muscle group
-  const deleteMuscleGroup = async (id) => {
-    if (!user) return { error: 'User not authenticated' };
-
-    try {
-      const { error } = await supabase
-        .from('muscle_groups')
-        .delete()
-        .eq('id', id);
-
-      if (error) throw error;
-
-      // Remove from local state
-      setMuscleGroups(prev => prev.filter(mg => mg.id !== id));
-
-      return { error: null };
-    } catch (err) {
-      console.error('Error deleting muscle group:', err);
-      return { error: err.message };
-    }
-  };
 
   // Fetch data when user changes
   useEffect(() => {
     if (user) {
-      fetchMuscleGroups();
       fetchExercises();
     } else {
       setExercises([]);
-      setMuscleGroups([]);
     }
   }, [user]);
 
   const value = {
     exercises,
-    muscleGroups,
     loading,
     error,
     addExercise,
     updateExercise,
     deleteExercise,
-    addMuscleGroup,
-    deleteMuscleGroup,
-    refetchExercises: fetchExercises,
-    refetchMuscleGroups: fetchMuscleGroups
+    refetchExercises: fetchExercises
   };
 
   return (

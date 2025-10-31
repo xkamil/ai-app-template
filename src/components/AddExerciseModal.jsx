@@ -4,10 +4,9 @@ import { useExercise } from '../context/ExerciseContext';
 
 const AddExerciseModal = ({ show, onClose, exercise = null }) => {
   const { t } = useLanguage();
-  const { muscleGroups, addExercise, updateExercise } = useExercise();
+  const { addExercise, updateExercise } = useExercise();
 
   const [name, setName] = useState('');
-  const [muscleGroupId, setMuscleGroupId] = useState('');
   const [description, setDescription] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -18,11 +17,9 @@ const AddExerciseModal = ({ show, onClose, exercise = null }) => {
   useEffect(() => {
     if (exercise) {
       setName(exercise.name || '');
-      setMuscleGroupId(exercise.muscle_group_id || '');
       setDescription(exercise.description || '');
     } else {
       setName('');
-      setMuscleGroupId('');
       setDescription('');
     }
     setError('');
@@ -41,7 +38,6 @@ const AddExerciseModal = ({ show, onClose, exercise = null }) => {
 
     const exerciseData = {
       name: name.trim(),
-      muscleGroupId: muscleGroupId || null,
       description: description.trim() || null
     };
 
@@ -61,7 +57,6 @@ const AddExerciseModal = ({ show, onClose, exercise = null }) => {
   const handleClose = () => {
     if (!loading) {
       setName('');
-      setMuscleGroupId('');
       setDescription('');
       setError('');
       onClose();
@@ -156,37 +151,6 @@ const AddExerciseModal = ({ show, onClose, exercise = null }) => {
                 disabled={loading}
                 required
               />
-            </div>
-
-            {/* Muscle Group Select */}
-            <div style={{ marginBottom: 'var(--space-4)' }}>
-              <label
-                htmlFor="muscleGroup"
-                style={{
-                  display: 'block',
-                  fontSize: 'var(--text-sm)',
-                  fontWeight: 'var(--font-medium)',
-                  color: 'var(--text-primary)',
-                  marginBottom: 'var(--space-2)'
-                }}
-              >
-                💪 {t('exercises.addModal.muscleGroupLabel')}
-              </label>
-              <select
-                id="muscleGroup"
-                className="dark-input"
-                value={muscleGroupId}
-                onChange={(e) => setMuscleGroupId(e.target.value)}
-                disabled={loading}
-                style={{ cursor: 'pointer' }}
-              >
-                <option value="">{t('exercises.addModal.muscleGroupPlaceholder')}</option>
-                {muscleGroups.map((group) => (
-                  <option key={group.id} value={group.id}>
-                    {group.name}
-                  </option>
-                ))}
-              </select>
             </div>
 
             {/* Description Textarea */}

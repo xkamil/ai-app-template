@@ -25,17 +25,10 @@ const ExerciseCard = ({ exercise, onEdit, onDelete }) => {
             fontSize: 'var(--text-lg)',
             fontWeight: 'var(--font-semibold)',
             color: 'var(--text-primary)',
-            margin: '0 0 var(--space-2) 0'
+            margin: 0
           }}>
             🏋️ {exercise.name}
           </h3>
-
-          {/* Muscle Group Badge */}
-          {exercise.muscle_group && (
-            <span className="dark-badge" style={{ marginRight: 'var(--space-2)' }}>
-              💪 {exercise.muscle_group.name}
-            </span>
-          )}
         </div>
       </div>
 

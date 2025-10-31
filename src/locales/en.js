@@ -176,7 +176,6 @@ export default {
     title: "Exercises",
     search: "Search exercise...",
     count: "You have {count} exercises",
-    categoryAll: "All",
     pr: "PR: {weight}kg @ {reps} reps",
     lastUsed: "Last used: {time}",
     workoutsCount: "{count} workouts",
@@ -190,8 +189,6 @@ export default {
       cancel: "Cancel",
       nameLabel: "Name",
       namePlaceholder: "e.g. Bench Press",
-      muscleGroupLabel: "Muscle group (optional)",
-      muscleGroupPlaceholder: "Select category",
       descriptionLabel: "Description (optional)",
       descriptionPlaceholder: "Exercise description...",
       submit: "ADD EXERCISE"
@@ -294,13 +291,6 @@ export default {
       unitsLbs: "Pounds (lbs)",
       darkMode: "Dark mode",
       darkModeAlways: "Always on"
-    },
-    categories: {
-      title: "Categories",
-      manage: "Manage muscle groups",
-      add: "Add category",
-      deleteConfirm: "Delete category \"{name}\"?",
-      deleteError: "Cannot delete category with assigned exercises"
     },
     data: {
       title: "Data",

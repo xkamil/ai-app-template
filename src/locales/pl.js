@@ -176,7 +176,6 @@ export default {
     title: "Ćwiczenia",
     search: "Wyszukaj ćwiczenie...",
     count: "Masz {count} ćwiczeń",
-    categoryAll: "Wszystkie",
     pr: "PR: {weight}kg @ {reps} reps",
     lastUsed: "Ostatnio: {time}",
     workoutsCount: "{count} treningów",
@@ -190,8 +189,6 @@ export default {
       cancel: "Anuluj",
       nameLabel: "Nazwa",
       namePlaceholder: "np. Bench Press",
-      muscleGroupLabel: "Grupa mięśniowa (opcjonalnie)",
-      muscleGroupPlaceholder: "Wybierz kategorię",
       descriptionLabel: "Opis (opcjonalnie)",
       descriptionPlaceholder: "Opis ćwiczenia...",
       submit: "DODAJ ĆWICZENIE"
@@ -294,13 +291,6 @@ export default {
       unitsLbs: "Funty (lbs)",
       darkMode: "Tryb ciemny",
       darkModeAlways: "Zawsze włączony"
-    },
-    categories: {
-      title: "Kategorie",
-      manage: "Zarządzaj grupami mięśniowymi",
-      add: "Dodaj kategorię",
-      deleteConfirm: "Usuń kategorię \"{name}\"?",
-      deleteError: "Nie można usunąć kategorii z przypisanymi ćwiczeniami"
     },
     data: {
       title: "Dane",

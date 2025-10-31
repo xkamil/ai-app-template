@@ -7,12 +7,11 @@ import ExerciseCard from '../components/ExerciseCard';
 
 const ExercisesLibraryPage = () => {
   const { t } = useLanguage();
-  const { exercises, muscleGroups, loading, deleteExercise } = useExercise();
+  const { exercises, loading, deleteExercise } = useExercise();
 
   const [showModal, setShowModal] = useState(false);
   const [editingExercise, setEditingExercise] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
 
   // Filter exercises
   const filteredExercises = useMemo(() => {
@@ -23,33 +22,12 @@ const ExercisesLibraryPage = () => {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(ex =>
         ex.name.toLowerCase().includes(query) ||
-        (ex.description && ex.description.toLowerCase().includes(query)) ||
-        (ex.muscle_group && ex.muscle_group.name.toLowerCase().includes(query))
+        (ex.description && ex.description.toLowerCase().includes(query))
       );
     }
 
-    // Filter by category
-    if (selectedCategory !== 'all') {
-      filtered = filtered.filter(ex => ex.muscle_group_id === selectedCategory);
-    }
-
     return filtered;
-  }, [exercises, searchQuery, selectedCategory]);
-
-  // Group exercises by muscle group
-  const groupedExercises = useMemo(() => {
-    const groups = {};
-
-    filteredExercises.forEach(exercise => {
-      const groupName = exercise.muscle_group?.name || 'Uncategorized';
-      if (!groups[groupName]) {
-        groups[groupName] = [];
-      }
-      groups[groupName].push(exercise);
-    });
-
-    return groups;
-  }, [filteredExercises]);
+  }, [exercises, searchQuery]);
 
   const handleAddNew = () => {
     setEditingExercise(null);
@@ -133,54 +111,6 @@ const ExercisesLibraryPage = () => {
           </div>
         </div>
 
-        {/* Category Filter Chips */}
-        <div style={{
-          display: 'flex',
-          gap: 'var(--space-2)',
-          overflowX: 'auto',
-          paddingBottom: 'var(--space-2)',
-          marginBottom: 'var(--space-4)',
-          scrollbarWidth: 'thin'
-        }}>
-          <button
-            onClick={() => setSelectedCategory('all')}
-            style={{
-              padding: 'var(--space-2) var(--space-4)',
-              background: selectedCategory === 'all' ? 'var(--accent-primary)' : 'var(--bg-tertiary)',
-              border: 'none',
-              borderRadius: 'var(--radius-md)',
-              color: selectedCategory === 'all' ? 'white' : 'var(--text-secondary)',
-              fontSize: 'var(--text-sm)',
-              fontWeight: 'var(--font-medium)',
-              cursor: 'pointer',
-              whiteSpace: 'nowrap',
-              transition: 'all var(--transition-fast)'
-            }}
-          >
-            {t('exercises.categoryAll')}
-          </button>
-          {muscleGroups.map(group => (
-            <button
-              key={group.id}
-              onClick={() => setSelectedCategory(group.id)}
-              style={{
-                padding: 'var(--space-2) var(--space-4)',
-                background: selectedCategory === group.id ? 'var(--accent-primary)' : 'var(--bg-tertiary)',
-                border: 'none',
-                borderRadius: 'var(--radius-md)',
-                color: selectedCategory === group.id ? 'white' : 'var(--text-secondary)',
-                fontSize: 'var(--text-sm)',
-                fontWeight: 'var(--font-medium)',
-                cursor: 'pointer',
-                whiteSpace: 'nowrap',
-                transition: 'all var(--transition-fast)'
-              }}
-            >
-              {group.name}
-            </button>
-          ))}
-        </div>
-
         {/* Loading State */}
         {loading ? (
           <div style={{ textAlign: 'center', padding: 'var(--space-8)' }}>
@@ -205,33 +135,15 @@ const ExercisesLibraryPage = () => {
             )}
           </div>
         ) : (
-          /* Exercise List Grouped by Muscle Group */
+          /* Exercise List */
           <div>
-            {Object.entries(groupedExercises).map(([groupName, groupExercises]) => (
-              <div key={groupName} style={{ marginBottom: 'var(--space-5)' }}>
-                {/* Group Header */}
-                <h2 style={{
-                  fontSize: 'var(--text-lg)',
-                  fontWeight: 'var(--font-semibold)',
-                  color: 'var(--text-primary)',
-                  marginBottom: 'var(--space-3)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 'var(--space-2)'
-                }}>
-                  💪 {groupName} ({groupExercises.length})
-                </h2>
-
-                {/* Exercise Cards */}
-                {groupExercises.map(exercise => (
-                  <ExerciseCard
-                    key={exercise.id}
-                    exercise={exercise}
-                    onEdit={handleEdit}
-                    onDelete={handleDelete}
-                  />
-                ))}
-              </div>
+            {filteredExercises.map(exercise => (
+              <ExerciseCard
+                key={exercise.id}
+                exercise={exercise}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+              />
             ))}
           </div>
         )}

@@ -11,66 +11,21 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- =====================================================
--- TABLE 1: MUSCLE GROUPS
+-- TABLE 1: EXERCISES
 -- =====================================================
--- Stores muscle group categories for organizing exercises
--- Users can create their own custom muscle groups
-
-CREATE TABLE IF NOT EXISTS public.muscle_groups (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-    name TEXT NOT NULL,
-    description TEXT,
-    created_at TIMESTAMPTZ DEFAULT NOW(),
-    updated_at TIMESTAMPTZ DEFAULT NOW(),
-    UNIQUE(user_id, name)
-);
-
-COMMENT ON TABLE public.muscle_groups IS 'User-created muscle group categories for organizing exercises';
-
--- Enable Row Level Security
-ALTER TABLE public.muscle_groups ENABLE ROW LEVEL SECURITY;
-
--- RLS Policies for muscle_groups
-CREATE POLICY "Users can view their own muscle groups"
-    ON public.muscle_groups
-    FOR SELECT
-    USING (auth.uid() = user_id);
-
-CREATE POLICY "Users can insert their own muscle groups"
-    ON public.muscle_groups
-    FOR INSERT
-    WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "Users can update their own muscle groups"
-    ON public.muscle_groups
-    FOR UPDATE
-    USING (auth.uid() = user_id)
-    WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "Users can delete their own muscle groups"
-    ON public.muscle_groups
-    FOR DELETE
-    USING (auth.uid() = user_id);
-
--- =====================================================
--- TABLE 2: EXERCISES
--- =====================================================
--- Stores user-created exercises with optional muscle group categorization
+-- Stores user-created exercises
 
 CREATE TABLE IF NOT EXISTS public.exercises (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
     name TEXT NOT NULL,
-    muscle_group_id UUID REFERENCES public.muscle_groups(id) ON DELETE SET NULL,
     description TEXT,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW(),
     UNIQUE(user_id, name)
 );
 
-COMMENT ON TABLE public.exercises IS 'User-created exercises with optional muscle group category';
-COMMENT ON COLUMN public.exercises.muscle_group_id IS 'Optional reference to muscle group - can be NULL';
+COMMENT ON TABLE public.exercises IS 'User-created exercises';
 
 -- Enable Row Level Security
 ALTER TABLE public.exercises ENABLE ROW LEVEL SECURITY;
@@ -98,7 +53,7 @@ CREATE POLICY "Users can delete their own exercises"
     USING (auth.uid() = user_id);
 
 -- =====================================================
--- TABLE 3: WORKOUT PLANS
+-- TABLE 2: WORKOUT PLANS
 -- =====================================================
 -- Stores workout plan templates that users can create and reuse
 
@@ -143,7 +98,7 @@ CREATE POLICY "Users can delete their own workout plans"
     USING (auth.uid() = user_id);
 
 -- =====================================================
--- TABLE 4: WORKOUT PLAN EXERCISES
+-- TABLE 3: WORKOUT PLAN EXERCISES
 -- =====================================================
 -- Stores exercises that belong to a workout plan with suggested sets
 
@@ -220,7 +175,7 @@ CREATE POLICY "Users can delete their own workout plan exercises"
     );
 
 -- =====================================================
--- TABLE 5: WORKOUTS
+-- TABLE 4: WORKOUTS
 -- =====================================================
 -- Stores workout sessions logged by users
 
@@ -266,7 +221,7 @@ CREATE POLICY "Users can delete their own workouts"
     USING (auth.uid() = user_id);
 
 -- =====================================================
--- TABLE 6: WORKOUT EXERCISES
+-- TABLE 5: WORKOUT EXERCISES
 -- =====================================================
 -- Junction table linking exercises to workouts
 
@@ -342,7 +297,7 @@ CREATE POLICY "Users can delete their own workout exercises"
     );
 
 -- =====================================================
--- TABLE 7: EXERCISE SETS
+-- TABLE 6: EXERCISE SETS
 -- =====================================================
 -- Stores individual sets for each exercise with performance data
 
@@ -469,13 +424,9 @@ COMMENT ON VIEW public.personal_records IS 'Auto-calculated personal records for
 -- These indexes improve query performance for common operations
 
 -- Index for filtering by user_id (most common query pattern)
-CREATE INDEX IF NOT EXISTS idx_muscle_groups_user_id ON public.muscle_groups(user_id);
 CREATE INDEX IF NOT EXISTS idx_exercises_user_id ON public.exercises(user_id);
 CREATE INDEX IF NOT EXISTS idx_workout_plans_user_id ON public.workout_plans(user_id);
 CREATE INDEX IF NOT EXISTS idx_workouts_user_id ON public.workouts(user_id);
-
--- Index for exercise lookups by muscle group
-CREATE INDEX IF NOT EXISTS idx_exercises_muscle_group_id ON public.exercises(muscle_group_id);
 
 -- Index for workout date sorting and filtering
 CREATE INDEX IF NOT EXISTS idx_workouts_workout_date ON public.workouts(workout_date DESC);
@@ -506,11 +457,6 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Apply triggers to all tables with updated_at column
-CREATE TRIGGER update_muscle_groups_updated_at
-    BEFORE UPDATE ON public.muscle_groups
-    FOR EACH ROW
-    EXECUTE FUNCTION public.update_updated_at_column();
-
 CREATE TRIGGER update_exercises_updated_at
     BEFORE UPDATE ON public.exercises
     FOR EACH ROW
@@ -547,13 +493,12 @@ CREATE TRIGGER update_workout_plan_exercises_updated_at
 -- This schema is ready to be executed in Supabase SQL Editor
 --
 -- Tables created:
--- 1. muscle_groups - User-created categories
--- 2. exercises - User-created exercises with optional categories
--- 3. workout_plans - Workout plan templates
--- 4. workout_plan_exercises - Exercises in plans with suggested sets
--- 5. workouts - Workout sessions (with optional plan reference)
--- 6. workout_exercises - Exercises in workouts
--- 7. exercise_sets - Individual sets with reps/weight/duration
+-- 1. exercises - User-created exercises
+-- 2. workout_plans - Workout plan templates
+-- 3. workout_plan_exercises - Exercises in plans with suggested sets
+-- 4. workouts - Workout sessions (with optional plan reference)
+-- 5. workout_exercises - Exercises in workouts
+-- 6. exercise_sets - Individual sets with reps/weight/duration
 --
 -- Views created:
 -- 1. personal_records - Auto-calculated PRs
