@@ -101,6 +101,14 @@ export default {
       greatStart: "Great start! Keep going!",
       keepGoing: "Amazing! Keep up the great work!"
     },
+    monthSummary: {
+      title: "Month Summary",
+      workouts: "Workouts",
+      hours: "Hours",
+      noWorkouts: "No workouts this month yet. Time to start!",
+      greatStart: "Great start! Keep going!",
+      keepGoing: "Amazing! Keep up the great work!"
+    },
     emptyState: {
       title: "No workouts yet",
       subtitle: "Start your first workout!",

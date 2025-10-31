@@ -2,15 +2,15 @@ import { useLanguage } from '../context/LanguageContext';
 import { useWorkout } from '../context/WorkoutContext';
 import { useNavigate } from 'react-router-dom';
 import BottomNav from '../components/BottomNav';
-import WeekSummaryCard from '../components/WeekSummaryCard';
+import MonthSummaryCard from '../components/MonthSummaryCard';
 import WorkoutCard from '../components/WorkoutCard';
 
 const WorkoutsListPage = () => {
   const { t } = useLanguage();
-  const { workouts, loading, deleteWorkout, getWeekSummary } = useWorkout();
+  const { workouts, loading, deleteWorkout, getMonthSummary } = useWorkout();
   const navigate = useNavigate();
 
-  const weekSummary = getWeekSummary();
+  const monthSummary = getMonthSummary();
 
   const handleDelete = async (id) => {
     const result = await deleteWorkout(id);
@@ -65,8 +65,8 @@ const WorkoutsListPage = () => {
       </div>
 
       <div className="page-content">
-        {/* Week Summary */}
-        <WeekSummaryCard summary={weekSummary} />
+        {/* Month Summary */}
+        <MonthSummaryCard summary={monthSummary} />
 
         {/* Loading State */}
         {loading ? (

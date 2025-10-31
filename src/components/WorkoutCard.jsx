@@ -1,7 +1,9 @@
+import { useState } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 
 const WorkoutCard = ({ workout, onDelete }) => {
   const { t } = useLanguage();
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const handleDelete = () => {
     if (window.confirm(t('workouts.deleteConfirm.message').replace('{name}', workout.name || formatDate(workout.workout_date)))) {
@@ -36,12 +38,18 @@ const WorkoutCard = ({ workout, onDelete }) => {
   // Check if workout contains any PR (placeholder for future implementation)
   const hasPR = false; // TODO: Implement PR detection
 
+  const handleCardClick = () => {
+    setIsExpanded(!isExpanded);
+  };
+
   return (
     <div
       className="dark-card"
+      onClick={handleCardClick}
       style={{
         marginBottom: 'var(--space-3)',
-        transition: 'all var(--transition-base)'
+        transition: 'all var(--transition-base)',
+        cursor: 'pointer'
       }}
     >
       {/* Workout Header */}
@@ -75,14 +83,6 @@ const WorkoutCard = ({ workout, onDelete }) => {
                 </span>
               </div>
             )}
-            <h3 style={{
-              fontSize: 'var(--text-lg)',
-              fontWeight: 'var(--font-semibold)',
-              color: 'var(--text-primary)',
-              margin: 0
-            }}>
-              {workout.name || t('workouts.defaultName')}
-            </h3>
             {hasPR && (
               <span className="dark-badge" style={{
                 background: 'var(--accent-gradient)',
@@ -97,9 +97,15 @@ const WorkoutCard = ({ workout, onDelete }) => {
           <p style={{
             fontSize: 'var(--text-sm)',
             color: 'var(--text-secondary)',
-            margin: 0
+            margin: 0,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 'var(--space-2)'
           }}>
-            📅 {formatDate(workout.workout_date)} • ⏰ {formatTime(workout.workout_date)}
+            <span>📅 {formatDate(workout.workout_date)} • ⏰ {formatTime(workout.workout_date)}</span>
+            <span style={{ marginLeft: 'auto', fontSize: 'var(--text-base)' }}>
+              {isExpanded ? '▲' : '▼'}
+            </span>
           </p>
         </div>
       </div>
@@ -117,8 +123,8 @@ const WorkoutCard = ({ workout, onDelete }) => {
         </p>
       )}
 
-      {/* Exercise List */}
-      {workout.workout_exercises && workout.workout_exercises.length > 0 && (
+      {/* Exercise List - Collapsible */}
+      {isExpanded && workout.workout_exercises && workout.workout_exercises.length > 0 && (
         <div style={{ marginBottom: 'var(--space-3)' }}>
           {workout.workout_exercises
             .sort((a, b) => a.order_index - b.order_index)
@@ -189,34 +195,39 @@ const WorkoutCard = ({ workout, onDelete }) => {
         )}
       </div>
 
-      {/* Action Button */}
-      <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
-        <button
-          onClick={handleDelete}
-          style={{
-            flex: 1,
-            padding: 'var(--space-2) var(--space-3)',
-            background: 'transparent',
-            border: '1px solid var(--danger)',
-            borderRadius: 'var(--radius-md)',
-            color: 'var(--danger)',
-            fontSize: 'var(--text-sm)',
-            fontWeight: 'var(--font-medium)',
-            cursor: 'pointer',
-            transition: 'all var(--transition-fast)'
-          }}
-          onMouseEnter={(e) => {
-            e.target.style.background = 'var(--danger)';
-            e.target.style.color = 'white';
-          }}
-          onMouseLeave={(e) => {
-            e.target.style.background = 'transparent';
-            e.target.style.color = 'var(--danger)';
-          }}
-        >
-          🗑️ {t('workouts.actions.delete')}
-        </button>
-      </div>
+      {/* Action Button - Only visible when expanded */}
+      {isExpanded && (
+        <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              handleDelete();
+            }}
+            style={{
+              flex: 1,
+              padding: 'var(--space-2) var(--space-3)',
+              background: 'transparent',
+              border: '1px solid var(--danger)',
+              borderRadius: 'var(--radius-md)',
+              color: 'var(--danger)',
+              fontSize: 'var(--text-sm)',
+              fontWeight: 'var(--font-medium)',
+              cursor: 'pointer',
+              transition: 'all var(--transition-fast)'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.background = 'var(--danger)';
+              e.target.style.color = 'white';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.background = 'transparent';
+              e.target.style.color = 'var(--danger)';
+            }}
+          >
+            🗑️ {t('workouts.actions.delete')}
+          </button>
+        </div>
+      )}
     </div>
   );
 };

@@ -230,6 +230,42 @@ export const WorkoutProvider = ({ children }) => {
     };
   };
 
+  // Get month summary (last 30 days)
+  const getMonthSummary = () => {
+    const now = new Date();
+    const thirtyDaysAgo = new Date(now);
+    thirtyDaysAgo.setDate(now.getDate() - 30);
+    thirtyDaysAgo.setHours(0, 0, 0, 0);
+
+    const thisMonthWorkouts = workouts.filter(workout => {
+      const workoutDate = new Date(workout.workout_date);
+      return workoutDate >= thirtyDaysAgo;
+    });
+
+    const totalMinutes = thisMonthWorkouts.reduce((sum, workout) => {
+      if (!workout.workout_exercises || workout.workout_exercises.length === 0) return sum;
+
+      // Calculate duration from created_at to updated_at or estimate from sets
+      const start = new Date(workout.created_at);
+      const end = new Date(workout.updated_at);
+      const diffMinutes = Math.round((end - start) / 1000 / 60);
+
+      // If difference is reasonable (between 5 and 180 minutes), use it
+      if (diffMinutes >= 5 && diffMinutes <= 180) {
+        return sum + diffMinutes;
+      }
+
+      // Otherwise estimate: 3 minutes per exercise
+      return sum + (workout.workout_exercises.length * 3);
+    }, 0);
+
+    return {
+      count: thisMonthWorkouts.length,
+      totalHours: (totalMinutes / 60).toFixed(1),
+      workouts: thisMonthWorkouts
+    };
+  };
+
   // Fetch data when user changes
   useEffect(() => {
     if (user) {
@@ -247,6 +283,7 @@ export const WorkoutProvider = ({ children }) => {
     deleteWorkout,
     getPersonalRecords,
     getWeekSummary,
+    getMonthSummary,
     refetchWorkouts: fetchWorkouts
   };
 

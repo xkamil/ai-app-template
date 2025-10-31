@@ -101,6 +101,14 @@ export default {
       greatStart: "Świetny początek! Kontynuuj!",
       keepGoing: "Niesamowite! Trzymaj tak dalej!"
     },
+    monthSummary: {
+      title: "Podsumowanie miesiąca",
+      workouts: "Treningi",
+      hours: "Godziny",
+      noWorkouts: "Brak treningów w tym miesiącu. Czas zacząć!",
+      greatStart: "Świetny start! Kontynuuj!",
+      keepGoing: "Niesamowite! Trzymaj tak dalej!"
+    },
     emptyState: {
       title: "Brak treningów",
       subtitle: "Rozpocznij swój pierwszy trening!",
