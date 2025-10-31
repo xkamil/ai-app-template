@@ -32,13 +32,18 @@ const WorkoutPlanModal = ({ isOpen, onClose, onSave, editingPlan }) => {
       setPlanDescription(editingPlan.description || '');
 
       // Map workout_plan_exercises to selectedExercises format
-      const exercisesWithSets = editingPlan.workout_plan_exercises?.map((pe, index) => ({
-        exercise_id: pe.exercise_id,
-        order_index: pe.order_index !== undefined ? pe.order_index : index,
-        suggested_sets: pe.suggested_sets || 3,
-        notes: pe.notes || '',
-        exercise: pe.exercise
-      })) || [];
+      const exercisesWithSets = editingPlan.workout_plan_exercises?.map((pe, index) => {
+        // Get exercise_id - might be in pe.exercise_id or pe.exercise.id
+        const exerciseId = pe.exercise_id || pe.exercise?.id;
+
+        return {
+          exercise_id: exerciseId,
+          order_index: pe.order_index !== undefined ? pe.order_index : index,
+          suggested_sets: pe.suggested_sets || 3,
+          notes: pe.notes || '',
+          exercise: pe.exercise
+        };
+      }).filter(e => e.exercise_id) || []; // Filter out any without exercise_id
 
       setSelectedExercises(exercisesWithSets);
     } else {

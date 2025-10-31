@@ -76,25 +76,46 @@ const WorkoutPlansPage = () => {
 
   return (
     <div className="page-container">
+      {/* Header */}
       <div className="page-header">
-        <h1 className="page-title">
-          {t('plans.title')}
-        </h1>
-        <p className="page-subtitle">
-          {t('plans.subtitle')}
-        </p>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <h1 className="page-title">
+              {t('plans.title')}
+            </h1>
+            <p className="page-subtitle">
+              {t('plans.subtitle')}
+            </p>
+          </div>
+          <button
+            onClick={handleCreatePlan}
+            style={{
+              background: 'var(--accent-gradient)',
+              border: 'none',
+              borderRadius: 'var(--radius-md)',
+              padding: 'var(--space-3) var(--space-4)',
+              color: 'white',
+              fontSize: 'var(--text-lg)',
+              fontWeight: 'var(--font-semibold)',
+              cursor: 'pointer',
+              boxShadow: 'var(--shadow-sm)',
+              transition: 'all var(--transition-base)'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.transform = 'translateY(-2px)';
+              e.target.style.boxShadow = 'var(--shadow-md)';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.transform = 'translateY(0)';
+              e.target.style.boxShadow = 'var(--shadow-sm)';
+            }}
+          >
+            ➕
+          </button>
+        </div>
       </div>
 
       <div className="page-content">
-        {/* Create Plan Button */}
-        <button
-          onClick={handleCreatePlan}
-          className="gradient-button"
-          style={{ width: '100%', marginBottom: 'var(--space-4)' }}
-        >
-          ➕ {t('plans.create')}
-        </button>
-
         {/* Plans List */}
         {workoutPlans.length === 0 ? (
           <div className="dark-card fade-in" style={{ textAlign: 'center', padding: '40px 20px' }}>

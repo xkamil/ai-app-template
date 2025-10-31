@@ -38,6 +38,7 @@ export const WorkoutPlanProvider = ({ children }) => {
           *,
           workout_plan_exercises(
             id,
+            exercise_id,
             order_index,
             suggested_sets,
             notes,
