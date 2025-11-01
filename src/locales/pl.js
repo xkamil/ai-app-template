@@ -212,6 +212,8 @@ export default {
       namePlaceholder: "np. Bench Press",
       descriptionLabel: "Opis (opcjonalnie)",
       descriptionPlaceholder: "Opis ćwiczenia...",
+      planLabel: "Plan treningowy (opcjonalnie)",
+      noPlanOption: "Brak",
       submit: "DODAJ ĆWICZENIE"
     },
     emptyState: {

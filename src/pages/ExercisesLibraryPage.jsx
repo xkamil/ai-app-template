@@ -137,7 +137,7 @@ const ExercisesLibraryPage = () => {
 
       <div className="page-content">
         {/* Search Bar */}
-        <div style={{ marginBottom: 'var(--space-2)' }}>
+        <div style={{ marginBottom: 'var(--space-2)', position: 'relative' }}>
           <input
             type="text"
             className="dark-input"
@@ -145,9 +145,39 @@ const ExercisesLibraryPage = () => {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             style={{
-              fontSize: 'var(--text-base)'
+              fontSize: 'var(--text-base)',
+              paddingRight: searchQuery ? 'var(--space-10)' : 'var(--space-3)'
             }}
           />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              style={{
+                position: 'absolute',
+                right: 'var(--space-3)',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                background: 'transparent',
+                border: 'none',
+                color: 'var(--text-tertiary)',
+                fontSize: 'var(--text-lg)',
+                cursor: 'pointer',
+                padding: 'var(--space-1)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transition: 'color var(--transition-fast)'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.color = 'var(--text-primary)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.color = 'var(--text-tertiary)';
+              }}
+            >
+              ✕
+            </button>
+          )}
         </div>
 
         {/* Sort and Filter Buttons */}

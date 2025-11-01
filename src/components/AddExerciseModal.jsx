@@ -1,13 +1,16 @@
 import { useState, useEffect } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { useExercise } from '../context/ExerciseContext';
+import { useWorkoutPlan } from '../context/WorkoutPlanContext';
 
 const AddExerciseModal = ({ show, onClose, exercise = null }) => {
   const { t } = useLanguage();
   const { addExercise, updateExercise } = useExercise();
+  const { workoutPlans, addExerciseToPlan, removeExerciseFromPlan } = useWorkoutPlan();
 
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
+  const [selectedPlanId, setSelectedPlanId] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -18,12 +21,19 @@ const AddExerciseModal = ({ show, onClose, exercise = null }) => {
     if (exercise) {
       setName(exercise.name || '');
       setDescription(exercise.description || '');
+
+      // Find which plan this exercise belongs to
+      const assignedPlan = workoutPlans.find(plan =>
+        plan.workout_plan_exercises?.some(wpe => wpe.exercise_id === exercise.id)
+      );
+      setSelectedPlanId(assignedPlan?.id || '');
     } else {
       setName('');
       setDescription('');
+      setSelectedPlanId('');
     }
     setError('');
-  }, [exercise, show]);
+  }, [exercise, show, workoutPlans]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -41,23 +51,60 @@ const AddExerciseModal = ({ show, onClose, exercise = null }) => {
       description: description.trim() || null
     };
 
+    // Save/update exercise first
     const result = isEditMode
       ? await updateExercise(exercise.id, exerciseData)
       : await addExercise(exerciseData);
 
-    setLoading(false);
-
     if (result.error) {
+      setLoading(false);
       setError(result.error);
-    } else {
-      onClose();
+      return;
     }
+
+    // Handle plan assignment
+    const savedExerciseId = isEditMode ? exercise.id : result.data.id;
+
+    if (isEditMode) {
+      // In edit mode, handle plan change
+      const oldPlan = workoutPlans.find(plan =>
+        plan.workout_plan_exercises?.some(wpe => wpe.exercise_id === exercise.id)
+      );
+
+      // If plan changed
+      if (oldPlan?.id !== selectedPlanId) {
+        // Remove from old plan if exists
+        if (oldPlan) {
+          await removeExerciseFromPlan(oldPlan.id, exercise.id);
+        }
+
+        // Add to new plan if selected
+        if (selectedPlanId) {
+          const addResult = await addExerciseToPlan(selectedPlanId, savedExerciseId);
+          if (addResult.error) {
+            setError(addResult.error);
+          }
+        }
+      }
+    } else {
+      // In add mode, just add to plan if selected
+      if (selectedPlanId) {
+        const addResult = await addExerciseToPlan(selectedPlanId, savedExerciseId);
+        if (addResult.error) {
+          setError(addResult.error);
+        }
+      }
+    }
+
+    setLoading(false);
+    onClose();
   };
 
   const handleClose = () => {
     if (!loading) {
       setName('');
       setDescription('');
+      setSelectedPlanId('');
       setError('');
       onClose();
     }
@@ -154,7 +201,7 @@ const AddExerciseModal = ({ show, onClose, exercise = null }) => {
             </div>
 
             {/* Description Textarea */}
-            <div style={{ marginBottom: 'var(--space-5)' }}>
+            <div style={{ marginBottom: 'var(--space-4)' }}>
               <label
                 htmlFor="description"
                 style={{
@@ -177,6 +224,36 @@ const AddExerciseModal = ({ show, onClose, exercise = null }) => {
                 rows={3}
                 style={{ resize: 'vertical' }}
               />
+            </div>
+
+            {/* Plan Selection */}
+            <div style={{ marginBottom: 'var(--space-5)' }}>
+              <label
+                htmlFor="planSelect"
+                style={{
+                  display: 'block',
+                  fontSize: 'var(--text-sm)',
+                  fontWeight: 'var(--font-medium)',
+                  color: 'var(--text-primary)',
+                  marginBottom: 'var(--space-2)'
+                }}
+              >
+                📋 {t('exercises.addModal.planLabel')}
+              </label>
+              <select
+                id="planSelect"
+                className="dark-input"
+                value={selectedPlanId}
+                onChange={(e) => setSelectedPlanId(e.target.value)}
+                disabled={loading}
+              >
+                <option value="">{t('exercises.addModal.noPlanOption')}</option>
+                {workoutPlans.map(plan => (
+                  <option key={plan.id} value={plan.id}>
+                    {plan.name}
+                  </option>
+                ))}
+              </select>
             </div>
 
             {/* Buttons */}

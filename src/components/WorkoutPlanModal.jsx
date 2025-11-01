@@ -149,11 +149,6 @@ const WorkoutPlanModal = ({ isOpen, onClose, onSave, editingPlan }) => {
       return;
     }
 
-    if (selectedExercises.length === 0) {
-      alert(t('plans.modal.exercisesRequired'));
-      return;
-    }
-
     onSave({
       name: planName.trim(),
       color: planColor,

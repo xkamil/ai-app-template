@@ -237,6 +237,64 @@ export const WorkoutPlanProvider = ({ children }) => {
     }
   };
 
+  // Add exercise to a workout plan
+  const addExerciseToPlan = async (planId, exerciseId) => {
+    if (!user) return { error: 'User not authenticated' };
+
+    try {
+      // Get current plan to find max order_index
+      const plan = workoutPlans.find(p => p.id === planId);
+      if (!plan) return { error: 'Plan not found' };
+
+      const maxOrder = plan.workout_plan_exercises?.length || 0;
+
+      // Insert exercise into plan
+      const { data, error } = await supabase
+        .from('workout_plan_exercises')
+        .insert([{
+          workout_plan_id: planId,
+          exercise_id: exerciseId,
+          order_index: maxOrder,
+          suggested_sets: 3,
+          notes: ''
+        }])
+        .select('*');
+
+      if (error) throw error;
+
+      // Refresh plans
+      await fetchWorkoutPlans();
+
+      return { data, error: null };
+    } catch (err) {
+      console.error('Error adding exercise to plan:', err);
+      return { error: err.message };
+    }
+  };
+
+  // Remove exercise from a workout plan
+  const removeExerciseFromPlan = async (planId, exerciseId) => {
+    if (!user) return { error: 'User not authenticated' };
+
+    try {
+      const { error } = await supabase
+        .from('workout_plan_exercises')
+        .delete()
+        .eq('workout_plan_id', planId)
+        .eq('exercise_id', exerciseId);
+
+      if (error) throw error;
+
+      // Refresh plans
+      await fetchWorkoutPlans();
+
+      return { error: null };
+    } catch (err) {
+      console.error('Error removing exercise from plan:', err);
+      return { error: err.message };
+    }
+  };
+
   // Get suggested sets for an exercise based on PRs
   const getSuggestedSetsForExercise = (exerciseId, suggestedSetCount = 3) => {
     const personalRecords = getPersonalRecords();
@@ -298,6 +356,8 @@ export const WorkoutPlanProvider = ({ children }) => {
     updateWorkoutPlan,
     deleteWorkoutPlan,
     clonePlan,
+    addExerciseToPlan,
+    removeExerciseFromPlan,
     getSuggestedSetsForExercise,
     refetchWorkoutPlans: fetchWorkoutPlans
   };

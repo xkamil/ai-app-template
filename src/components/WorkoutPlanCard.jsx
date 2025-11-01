@@ -90,7 +90,9 @@ const WorkoutPlanCard = ({ plan, onEdit, onDelete, onSelect, onClone, lastWorkou
         color: 'var(--text-tertiary)',
         marginBottom: 'var(--space-2)'
       }}>
-        <span>
+        <span style={{
+          color: (plan.workout_plan_exercises?.length || 0) === 0 ? 'var(--danger)' : 'inherit'
+        }}>
           💪 {plan.workout_plan_exercises?.length || 0} {t('plans.exercises')}
         </span>
         {plan.workout_plan_exercises && plan.workout_plan_exercises.length > 0 && (
@@ -117,17 +119,30 @@ const WorkoutPlanCard = ({ plan, onEdit, onDelete, onSelect, onClone, lastWorkou
           paddingTop: 'var(--space-3)',
           borderTop: '1px solid var(--border-color)'
         }}>
-          {/* Start Training Button */}
-          <button
-            onClick={handleStartWorkout}
-            className="gradient-button"
-            style={{
-              width: '100%',
-              marginBottom: 'var(--space-3)'
-            }}
-          >
-            🏋️ {t('plans.startWorkout')}
-          </button>
+          {/* Start Training Button or Empty Message */}
+          {plan.workout_plan_exercises?.length > 0 ? (
+            <button
+              onClick={handleStartWorkout}
+              className="gradient-button"
+              style={{
+                width: '100%',
+                marginBottom: 'var(--space-3)'
+              }}
+            >
+              🏋️ {t('plans.startWorkout')}
+            </button>
+          ) : (
+            <div style={{
+              color: 'var(--text-secondary)',
+              fontSize: 'var(--text-sm)',
+              textAlign: 'center',
+              padding: 'var(--space-3)',
+              marginBottom: 'var(--space-3)',
+              fontStyle: 'italic'
+            }}>
+              Aby rozpocząć trening najpierw dodaj ćwiczenia do planu
+            </div>
+          )}
 
           {/* Full Exercise List */}
           {plan.workout_plan_exercises && plan.workout_plan_exercises.length > 0 && (

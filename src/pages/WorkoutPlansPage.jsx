@@ -15,6 +15,7 @@ const WorkoutPlansPage = () => {
 
   const [showModal, setShowModal] = useState(false);
   const [editingPlan, setEditingPlan] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Function to get the last workout date for a plan
   const getLastWorkoutDate = (planId) => {
@@ -29,9 +30,21 @@ const WorkoutPlansPage = () => {
     return sortedWorkouts[0].workout_date;
   };
 
-  // Sort plans by last workout date (oldest/never used first)
-  const sortedPlans = useMemo(() => {
-    return [...workoutPlans].sort((a, b) => {
+  // Filter and sort plans
+  const filteredAndSortedPlans = useMemo(() => {
+    let filtered = workoutPlans;
+
+    // Filter by search query
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(plan =>
+        plan.name.toLowerCase().includes(query) ||
+        (plan.description && plan.description.toLowerCase().includes(query))
+      );
+    }
+
+    // Sort by last workout date (oldest/never used first)
+    return [...filtered].sort((a, b) => {
       const dateA = getLastWorkoutDate(a.id);
       const dateB = getLastWorkoutDate(b.id);
 
@@ -43,7 +56,7 @@ const WorkoutPlansPage = () => {
       // Otherwise sort by date (oldest first)
       return new Date(dateA) - new Date(dateB);
     });
-  }, [workoutPlans, workouts]);
+  }, [workoutPlans, workouts, searchQuery]);
 
   // Debug logging
   console.log('WorkoutPlansPage: workoutPlans:', workoutPlans);
@@ -154,6 +167,52 @@ const WorkoutPlansPage = () => {
       </div>
 
       <div className="page-content">
+        {/* Search Bar */}
+        {workoutPlans.length > 0 && (
+          <div style={{ marginBottom: 'var(--space-3)', position: 'relative' }}>
+            <input
+              type="text"
+              className="dark-input"
+              placeholder={t('newWorkout.step0.search')}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={{
+                fontSize: 'var(--text-base)',
+                paddingRight: searchQuery ? 'var(--space-10)' : 'var(--space-3)'
+              }}
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                style={{
+                  position: 'absolute',
+                  right: 'var(--space-3)',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'transparent',
+                  border: 'none',
+                  color: 'var(--text-tertiary)',
+                  fontSize: 'var(--text-lg)',
+                  cursor: 'pointer',
+                  padding: 'var(--space-1)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'color var(--transition-fast)'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.color = 'var(--text-primary)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.color = 'var(--text-tertiary)';
+                }}
+              >
+                ✕
+              </button>
+            )}
+          </div>
+        )}
+
         {/* Plans List */}
         {workoutPlans.length === 0 ? (
           <div className="dark-card fade-in" style={{ textAlign: 'center', padding: '40px 20px' }}>
@@ -168,9 +227,19 @@ const WorkoutPlansPage = () => {
               {t('plans.emptyState.cta')}
             </button>
           </div>
+        ) : filteredAndSortedPlans.length === 0 ? (
+          <div className="dark-card fade-in" style={{ textAlign: 'center', padding: '40px 20px' }}>
+            <div style={{ fontSize: '48px', marginBottom: '16px' }}>🔍</div>
+            <h2 style={{ color: 'var(--text-primary)', marginBottom: '8px' }}>
+              No plans found
+            </h2>
+            <p style={{ color: 'var(--text-secondary)', marginBottom: '24px' }}>
+              Try adjusting your search
+            </p>
+          </div>
         ) : (
           <>
-            {sortedPlans.map(plan => (
+            {filteredAndSortedPlans.map(plan => (
               <WorkoutPlanCard
                 key={plan.id}
                 plan={plan}
