@@ -219,7 +219,8 @@ const WorkoutPlanModal = ({ isOpen, onClose, onSave, editingPlan }) => {
           maxWidth: '600px',
           maxHeight: '90vh',
           overflowY: 'auto',
-          padding: 'var(--space-4)'
+          padding: 'var(--space-4)',
+          paddingBottom: '60px'
         }}
         onClick={(e) => e.stopPropagation()}
       >
