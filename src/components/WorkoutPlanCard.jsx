@@ -147,7 +147,7 @@ const WorkoutPlanCard = ({ plan, onEdit, onDelete, onSelect, onClone, lastWorkou
           marginBottom: 'var(--space-3)',
           fontStyle: 'italic'
         }}>
-          Aby rozpocząć trening najpierw dodaj ćwiczenia do planu
+          {t('plans.emptyPlanMessage')}
         </div>
       )}
 

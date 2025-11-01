@@ -505,11 +505,11 @@ const LogSetsStep = ({ selectedExercises, workoutData, onUpdateWorkoutData, onBa
               display: 'block',
               marginBottom: 'var(--space-2)'
             }}>
-              💬 Notes
+              💬 {t('newWorkout.step2.exerciseNotes')}
             </label>
             <textarea
               className="dark-input"
-              placeholder="Exercise notes..."
+              placeholder={t('newWorkout.step2.exerciseNotesPlaceholder')}
               value={workoutData.exercises[currentExercise.id]?.notes || ''}
               onChange={(e) => updateExerciseNotes(e.target.value)}
               rows={2}

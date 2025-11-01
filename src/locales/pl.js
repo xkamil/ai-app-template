@@ -81,7 +81,7 @@ export default {
     subtitle: "Historia treningów",
     greeting: "Witaj, {name}!",
     lastWorkout: "Ostatni trening: {time}",
-    startWorkout: "START WORKOUT",
+    startWorkout: "ROZPOCZNIJ TRENING",
     thisWeek: "Ten tydzień",
     workoutsCount: "{count} treningi",
     totalTime: "{hours}h",
@@ -113,7 +113,7 @@ export default {
     emptyState: {
       title: "Brak treningów",
       subtitle: "Rozpocznij swój pierwszy trening!",
-      cta: "START YOUR FIRST WORKOUT"
+      cta: "ROZPOCZNIJ SWÓJ PIERWSZY TRENING"
     },
     ongoing: {
       title: "Trening w toku",
@@ -177,10 +177,13 @@ export default {
       unskipExercise: "Odpomiń ćwiczenie",
       cancel: "Anuluj trening",
       confirmCancel: "Czy na pewno chcesz anulować trening? Wszystkie dane zostaną utracone.",
-      confirmFinishWithSkipped: "Czy na pewno chcesz zakończyć trening? Pominiesz pozostałe {count} ćwiczeń. Zostaną one automatycznie pominięte i nie zapiszą się w historii."
+      confirmFinishWithSkipped: "Czy na pewno chcesz zakończyć trening? Pominiesz pozostałe {count} ćwiczeń. Zostaną one automatycznie pominięte i nie zapiszą się w historii.",
+      exerciseNotes: "Notatki",
+      exerciseNotesPlaceholder: "Notatki do ćwiczenia..."
     },
     step3: {
       title: "Trening zakończony!",
+      subtitle: "Świetna robota! Gotowy do zapisu?",
       close: "Zamknij",
       summary: {
         duration: "Czas: {minutes} min",
@@ -188,6 +191,15 @@ export default {
         sets: "Serii: {count}",
         prs: "Nowe PRs: {count}"
       },
+      exercisesLabel: "Ćwiczeń",
+      totalSetsLabel: "Wszystkie Serie",
+      volumeLabel: "Objętość (kg)",
+      workoutNameLabel: "Nazwa Treningu",
+      workoutDetailsLabel: "Szczegóły Treningu",
+      setLabel: "Seria",
+      noData: "Brak danych",
+      saving: "Zapisywanie...",
+      saveButton: "Zapisz Trening",
       notesLabel: "Notatki (opcjonalnie)",
       notesPlaceholder: "Jak się czułeś? Notatki...",
       newRecords: "Nowe rekordy!",
@@ -208,6 +220,8 @@ export default {
     lastUsedDaysAgo: "{count} {days} temu",
     neverUsed: "nigdy",
     noPlan: "Brak planu",
+    noResultsFound: "Nie znaleziono ćwiczeń",
+    tryAdjustingSearch: "Spróbuj zmienić wyszukiwanie lub filtry",
     sort: {
       newest: "Najnowsze",
       mostUsed: "Najwięcej treningów",
@@ -231,7 +245,8 @@ export default {
       descriptionPlaceholder: "Opis ćwiczenia...",
       planLabel: "Plan treningowy (opcjonalnie)",
       noPlanOption: "Brak",
-      submit: "DODAJ ĆWICZENIE"
+      submit: "DODAJ ĆWICZENIE",
+      fieldRequired: "jest wymagane"
     },
     emptyState: {
       title: "Brak ćwiczeń",
@@ -264,6 +279,9 @@ export default {
     edit: "Edytuj",
     delete: "Usuń",
     clone: "Duplikuj",
+    noPlansFound: "Nie znaleziono planów",
+    tryAdjustingSearchPlans: "Spróbuj zmienić wyszukiwanie",
+    emptyPlanMessage: "Aby rozpocząć trening, najpierw dodaj ćwiczenia do planu",
     deleteConfirm: {
       title: "Usuń plan?",
       message: "Czy na pewno chcesz usunąć plan \"{name}\"?",

@@ -278,10 +278,10 @@ const ExercisesLibraryPage = () => {
           <div className="dark-card fade-in" style={{ textAlign: 'center', padding: '40px 20px' }}>
             <div style={{ fontSize: '48px', marginBottom: '16px' }}>💪</div>
             <h2 style={{ color: 'var(--text-primary)', marginBottom: '8px' }}>
-              {exercises.length === 0 ? t('exercises.emptyState.title') : 'No exercises found'}
+              {exercises.length === 0 ? t('exercises.emptyState.title') : t('exercises.noResultsFound')}
             </h2>
             <p style={{ color: 'var(--text-secondary)', marginBottom: '24px' }}>
-              {exercises.length === 0 ? t('exercises.emptyState.subtitle') : 'Try adjusting your search or filters'}
+              {exercises.length === 0 ? t('exercises.emptyState.subtitle') : t('exercises.tryAdjustingSearch')}
             </p>
             {exercises.length === 0 && (
               <button className="gradient-button" onClick={handleAddNew}>

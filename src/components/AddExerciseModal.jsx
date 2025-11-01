@@ -40,7 +40,7 @@ const AddExerciseModal = ({ show, onClose, exercise = null }) => {
     setError('');
 
     if (!name.trim()) {
-      setError(t('exercises.addModal.nameLabel') + ' is required');
+      setError(t('exercises.addModal.nameLabel') + ' ' + t('exercises.addModal.fieldRequired'));
       return;
     }
 

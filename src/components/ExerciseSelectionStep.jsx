@@ -114,7 +114,7 @@ const ExerciseSelectionStep = ({ selectedExercises, onToggleExercise, onNext, on
           <div className="dark-card" style={{ textAlign: 'center', padding: 'var(--space-8)' }}>
             <div style={{ fontSize: '48px', marginBottom: 'var(--space-3)' }}>💪</div>
             <p style={{ color: 'var(--text-secondary)' }}>
-              {exercises.length === 0 ? t('exercises.emptyState.subtitle') : 'No exercises found'}
+              {exercises.length === 0 ? t('exercises.emptyState.subtitle') : t('exercises.noResultsFound')}
             </p>
           </div>
         ) : (

@@ -177,10 +177,13 @@ export default {
       unskipExercise: "Unskip exercise",
       cancel: "Cancel workout",
       confirmCancel: "Are you sure you want to cancel the workout? All data will be lost.",
-      confirmFinishWithSkipped: "Are you sure you want to finish the workout? You will skip the remaining {count} exercises. They will be automatically skipped and will not be saved in the history."
+      confirmFinishWithSkipped: "Are you sure you want to finish the workout? You will skip the remaining {count} exercises. They will be automatically skipped and will not be saved in the history.",
+      exerciseNotes: "Notes",
+      exerciseNotesPlaceholder: "Exercise notes..."
     },
     step3: {
       title: "Workout completed!",
+      subtitle: "Great job! Ready to save?",
       close: "Close",
       summary: {
         duration: "Duration: {minutes} min",
@@ -188,6 +191,15 @@ export default {
         sets: "Sets: {count}",
         prs: "New PRs: {count}"
       },
+      exercisesLabel: "Exercises",
+      totalSetsLabel: "Total Sets",
+      volumeLabel: "Volume (kg)",
+      workoutNameLabel: "Workout Name",
+      workoutDetailsLabel: "Workout Details",
+      setLabel: "Set",
+      noData: "No data",
+      saving: "Saving...",
+      saveButton: "Save Workout",
       notesLabel: "Notes (optional)",
       notesPlaceholder: "How did you feel? Notes...",
       newRecords: "New records!",
@@ -208,6 +220,8 @@ export default {
     lastUsedDaysAgo: "{count} {days} ago",
     neverUsed: "never",
     noPlan: "No plan",
+    noResultsFound: "No exercises found",
+    tryAdjustingSearch: "Try adjusting your search or filters",
     sort: {
       newest: "Newest",
       mostUsed: "Most workouts",
@@ -231,7 +245,8 @@ export default {
       descriptionPlaceholder: "Exercise description...",
       planLabel: "Workout Plan (optional)",
       noPlanOption: "None",
-      submit: "ADD EXERCISE"
+      submit: "ADD EXERCISE",
+      fieldRequired: "is required"
     },
     emptyState: {
       title: "No exercises yet",
@@ -264,6 +279,9 @@ export default {
     edit: "Edit",
     delete: "Delete",
     clone: "Duplicate",
+    noPlansFound: "No plans found",
+    tryAdjustingSearchPlans: "Try adjusting your search",
+    emptyPlanMessage: "To start training, first add exercises to the plan",
     deleteConfirm: {
       title: "Delete plan?",
       message: "Are you sure you want to delete plan \"{name}\"?",

@@ -40,7 +40,7 @@ const WorkoutSummaryStep = ({ workoutData, selectedExercises, onSave, saving, ex
           opacity: 0.9,
           margin: 0
         }}>
-          Great job! Ready to save?
+          {t('newWorkout.step3.subtitle')}
         </p>
       </div>
 
@@ -65,7 +65,7 @@ const WorkoutSummaryStep = ({ workoutData, selectedExercises, onSave, saving, ex
               fontSize: 'var(--text-xs)',
               color: 'var(--text-secondary)'
             }}>
-              Exercises
+              {t('newWorkout.step3.exercisesLabel')}
             </div>
           </div>
 
@@ -82,7 +82,7 @@ const WorkoutSummaryStep = ({ workoutData, selectedExercises, onSave, saving, ex
               fontSize: 'var(--text-xs)',
               color: 'var(--text-secondary)'
             }}>
-              Total Sets
+              {t('newWorkout.step3.totalSetsLabel')}
             </div>
           </div>
 
@@ -99,7 +99,7 @@ const WorkoutSummaryStep = ({ workoutData, selectedExercises, onSave, saving, ex
               fontSize: 'var(--text-xs)',
               color: 'var(--text-secondary)'
             }}>
-              Volume (kg)
+              {t('newWorkout.step3.volumeLabel')}
             </div>
           </div>
         </div>
@@ -112,7 +112,7 @@ const WorkoutSummaryStep = ({ workoutData, selectedExercises, onSave, saving, ex
               color: 'var(--text-secondary)',
               marginBottom: 'var(--space-1)'
             }}>
-              Workout Name
+              {t('newWorkout.step3.workoutNameLabel')}
             </div>
             <div style={{
               fontSize: 'var(--text-lg)',
@@ -131,7 +131,7 @@ const WorkoutSummaryStep = ({ workoutData, selectedExercises, onSave, saving, ex
           color: 'var(--text-primary)',
           marginBottom: 'var(--space-3)'
         }}>
-          📋 Workout Details
+          📋 {t('newWorkout.step3.workoutDetailsLabel')}
         </h3>
 
         {selectedExercises.map((exercise, index) => {
@@ -182,7 +182,7 @@ const WorkoutSummaryStep = ({ workoutData, selectedExercises, onSave, saving, ex
                           borderRadius: 'var(--radius-sm)'
                         }}
                       >
-                        Set {setIndex + 1}: {parts.join(' × ') || 'No data'}
+                        {t('newWorkout.step3.setLabel')} {setIndex + 1}: {parts.join(' × ') || t('newWorkout.step3.noData')}
                       </div>
                     );
                   })}
@@ -232,7 +232,7 @@ const WorkoutSummaryStep = ({ workoutData, selectedExercises, onSave, saving, ex
             cursor: saving ? 'not-allowed' : 'pointer'
           }}
         >
-          {saving ? '💾 Saving...' : '💾 Save Workout'}
+          {saving ? `💾 ${t('newWorkout.step3.saving')}` : `💾 ${t('newWorkout.step3.saveButton')}`}
         </button>
       </div>
     </div>

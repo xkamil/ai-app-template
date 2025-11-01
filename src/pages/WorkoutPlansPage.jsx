@@ -238,10 +238,10 @@ const WorkoutPlansPage = () => {
           <div className="dark-card fade-in" style={{ textAlign: 'center', padding: '40px 20px' }}>
             <div style={{ fontSize: '48px', marginBottom: '16px' }}>🔍</div>
             <h2 style={{ color: 'var(--text-primary)', marginBottom: '8px' }}>
-              No plans found
+              {t('plans.noPlansFound')}
             </h2>
             <p style={{ color: 'var(--text-secondary)', marginBottom: '24px' }}>
-              Try adjusting your search
+              {t('plans.tryAdjustingSearchPlans')}
             </p>
           </div>
         ) : (
