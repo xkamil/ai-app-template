@@ -1,7 +1,17 @@
 import { useLanguage } from '../context/LanguageContext';
+import { useWorkout } from '../context/WorkoutContext';
+import { useMemo } from 'react';
 
-const ExerciseCard = ({ exercise, onEdit, onDelete }) => {
+const ExerciseCard = ({ exercise, onEdit, onDelete, onClone }) => {
   const { t } = useLanguage();
+  const { workouts } = useWorkout();
+
+  // Calculate how many workouts used this exercise
+  const workoutsCount = useMemo(() => {
+    return workouts.filter(workout =>
+      workout.workout_exercises?.some(we => we.exercise?.id === exercise.id)
+    ).length;
+  }, [workouts, exercise.id]);
 
   const handleDelete = () => {
     if (window.confirm(t('exercises.deleteConfirm.message').replace('{name}', exercise.name))) {
@@ -27,7 +37,7 @@ const ExerciseCard = ({ exercise, onEdit, onDelete }) => {
             color: 'var(--text-primary)',
             margin: 0
           }}>
-            🏋️ {exercise.name}
+            {exercise.name}
           </h3>
         </div>
       </div>
@@ -44,19 +54,19 @@ const ExerciseCard = ({ exercise, onEdit, onDelete }) => {
         </p>
       )}
 
-      {/* Meta Info - Placeholder for future stats */}
+      {/* Meta Info - Stats */}
       <div style={{
         display: 'flex',
         gap: 'var(--space-4)',
-        fontSize: 'var(--text-xs)',
+        fontSize: 'var(--text-sm)',
         color: 'var(--text-tertiary)',
         marginBottom: 'var(--space-3)'
       }}>
-        <span>📊 0 {t('exercises.workoutsCount').replace('{count}', '0')}</span>
+        <span>📊 {t('exercises.workoutsCount', { count: workoutsCount })}</span>
       </div>
 
       {/* Action Buttons */}
-      <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
+      <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
         <button
           onClick={(e) => {
             e.stopPropagation();
@@ -64,26 +74,57 @@ const ExerciseCard = ({ exercise, onEdit, onDelete }) => {
           }}
           style={{
             flex: 1,
+            minWidth: '120px',
             padding: 'var(--space-2) var(--space-3)',
-            background: 'var(--bg-tertiary)',
-            border: '1px solid var(--border-color)',
+            background: 'transparent',
+            border: '1px solid var(--accent-primary)',
             borderRadius: 'var(--radius-md)',
-            color: 'var(--text-primary)',
+            color: 'var(--accent-primary)',
             fontSize: 'var(--text-sm)',
-            fontWeight: 'var(--font-medium)',
+            fontWeight: 'var(--font-semibold)',
             cursor: 'pointer',
             transition: 'all var(--transition-fast)'
           }}
           onMouseEnter={(e) => {
             e.target.style.background = 'var(--accent-primary)';
-            e.target.style.borderColor = 'var(--accent-primary)';
+            e.target.style.color = 'white';
           }}
           onMouseLeave={(e) => {
-            e.target.style.background = 'var(--bg-tertiary)';
-            e.target.style.borderColor = 'var(--border-color)';
+            e.target.style.background = 'transparent';
+            e.target.style.color = 'var(--accent-primary)';
           }}
         >
-          📝 {t('exercises.actions.edit')}
+          ✏️ {t('exercises.actions.edit')}
+        </button>
+
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onClone(exercise);
+          }}
+          style={{
+            flex: 1,
+            minWidth: '120px',
+            padding: 'var(--space-2) var(--space-3)',
+            background: 'transparent',
+            border: '1px solid var(--text-secondary)',
+            borderRadius: 'var(--radius-md)',
+            color: 'var(--text-secondary)',
+            fontSize: 'var(--text-sm)',
+            fontWeight: 'var(--font-semibold)',
+            cursor: 'pointer',
+            transition: 'all var(--transition-fast)'
+          }}
+          onMouseEnter={(e) => {
+            e.target.style.background = 'var(--text-secondary)';
+            e.target.style.color = 'var(--bg-primary)';
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.background = 'transparent';
+            e.target.style.color = 'var(--text-secondary)';
+          }}
+        >
+          📋 {t('exercises.actions.clone')}
         </button>
 
         <button
@@ -92,13 +133,15 @@ const ExerciseCard = ({ exercise, onEdit, onDelete }) => {
             handleDelete();
           }}
           style={{
+            flex: 1,
+            minWidth: '120px',
             padding: 'var(--space-2) var(--space-3)',
             background: 'transparent',
             border: '1px solid var(--danger)',
             borderRadius: 'var(--radius-md)',
             color: 'var(--danger)',
             fontSize: 'var(--text-sm)',
-            fontWeight: 'var(--font-medium)',
+            fontWeight: 'var(--font-semibold)',
             cursor: 'pointer',
             transition: 'all var(--transition-fast)'
           }}
@@ -111,7 +154,7 @@ const ExerciseCard = ({ exercise, onEdit, onDelete }) => {
             e.target.style.color = 'var(--danger)';
           }}
         >
-          🗑️
+          🗑️ {t('exercises.actions.delete')}
         </button>
       </div>
     </div>

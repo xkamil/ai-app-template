@@ -7,7 +7,7 @@ import ExerciseCard from '../components/ExerciseCard';
 
 const ExercisesLibraryPage = () => {
   const { t } = useLanguage();
-  const { exercises, loading, deleteExercise } = useExercise();
+  const { exercises, loading, deleteExercise, cloneExercise } = useExercise();
 
   const [showModal, setShowModal] = useState(false);
   const [editingExercise, setEditingExercise] = useState(null);
@@ -41,6 +41,13 @@ const ExercisesLibraryPage = () => {
 
   const handleDelete = async (id) => {
     const result = await deleteExercise(id);
+    if (result.error) {
+      alert(result.error);
+    }
+  };
+
+  const handleClone = async (exercise) => {
+    const result = await cloneExercise(exercise);
     if (result.error) {
       alert(result.error);
     }
@@ -94,7 +101,7 @@ const ExercisesLibraryPage = () => {
 
       <div className="page-content">
         {/* Search Bar */}
-        <div style={{ marginBottom: 'var(--space-4)' }}>
+        <div style={{ marginBottom: 'var(--space-2)' }}>
           <input
             type="text"
             className="dark-input"
@@ -102,13 +109,9 @@ const ExercisesLibraryPage = () => {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             style={{
-              fontSize: 'var(--text-base)',
-              paddingLeft: 'var(--space-5)'
+              fontSize: 'var(--text-base)'
             }}
           />
-          <div style={{ position: 'relative', top: '-38px', left: '16px', pointerEvents: 'none', fontSize: 'var(--text-lg)' }}>
-            🔍
-          </div>
         </div>
 
         {/* Loading State */}
@@ -143,6 +146,7 @@ const ExercisesLibraryPage = () => {
                 exercise={exercise}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
+                onClone={handleClone}
               />
             ))}
           </div>

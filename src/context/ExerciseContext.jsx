@@ -117,6 +117,31 @@ export const ExerciseProvider = ({ children }) => {
     }
   };
 
+  // Clone exercise
+  const cloneExercise = async (exercise) => {
+    if (!user) return { error: 'User not authenticated' };
+
+    try {
+      const { data, error } = await supabase
+        .from('exercises')
+        .insert([{
+          user_id: user.id,
+          name: `${exercise.name} (kopia)`,
+          description: exercise.description || null
+        }])
+        .select('*');
+
+      if (error) throw error;
+
+      // Add to local state
+      setExercises(prev => [...prev, data[0]].sort((a, b) => a.name.localeCompare(b.name)));
+
+      return { data: data[0], error: null };
+    } catch (err) {
+      console.error('Error cloning exercise:', err);
+      return { error: err.message };
+    }
+  };
 
   // Fetch data when user changes
   useEffect(() => {
@@ -134,6 +159,7 @@ export const ExerciseProvider = ({ children }) => {
     addExercise,
     updateExercise,
     deleteExercise,
+    cloneExercise,
     refetchExercises: fetchExercises
   };
 

@@ -190,7 +190,8 @@ export default {
     actions: {
       edit: "Edytuj",
       stats: "Statystyki",
-      delete: "Usuń"
+      delete: "Usuń",
+      clone: "Duplikuj"
     },
     addModal: {
       title: "Nowe ćwiczenie",
