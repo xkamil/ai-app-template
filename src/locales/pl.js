@@ -74,7 +74,6 @@ export default {
     workouts: "Treningi",
     plans: "Plany",
     exercises: "Ćwiczenia",
-    stats: "Statystyki",
     profile: "Profil"
   },
   workouts: {
@@ -251,47 +250,6 @@ export default {
       maxReps: "Max powtórzeń",
       maxWeight: "Max obciążenie",
       reps: "powtórzeń"
-    }
-  },
-  stats: {
-    title: "Statystyki",
-    activity: {
-      title: "Aktywność",
-      streak: "Streak",
-      workouts: "Workouts",
-      totalTime: "Total time",
-      days: ["Pn", "Wt", "Śr", "Cz", "Pt", "Sb", "Nd"]
-    },
-    prs: {
-      title: "Personal Records",
-      at: "@",
-      reps: "reps",
-      ago: "{time} temu",
-      viewDetails: "Zobacz szczegóły"
-    },
-    detail: {
-      personalRecord: "Personal Record",
-      achieved: "Osiągnięty: {date}",
-      improvement: "+{diff}kg od poprzedniego PR",
-      progress: "Postęp (ostatnie 3 miesiące)",
-      statistics: "Statystyki",
-      totalVolume: "Łączna objętość:",
-      avgWeight: "Średni ciężar:",
-      workoutsCount: "Liczba treningów:",
-      lastWorkout: "Ostatni trening:",
-      recordHistory: "Historia rekordów"
-    },
-    timeRange: {
-      week: "Ostatnie 7 dni",
-      month: "Ostatnie 30 dni",
-      threeMonths: "3 miesiące",
-      year: "Rok",
-      all: "Wszystko"
-    },
-    emptyState: {
-      title: "Brak danych",
-      subtitle: "Wykonaj pierwszy trening aby zobaczyć swoje statystyki i rekordy!",
-      cta: "START WORKOUT"
     }
   },
   plans: {

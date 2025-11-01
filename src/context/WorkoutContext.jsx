@@ -158,44 +158,6 @@ export const WorkoutProvider = ({ children }) => {
     }
   };
 
-  // Get Personal Records (PRs)
-  const getPersonalRecords = () => {
-    const prsMap = {};
-
-    workouts.forEach(workout => {
-      workout.workout_exercises?.forEach(we => {
-        const exerciseId = we.exercise?.id;
-        const exerciseName = we.exercise?.name;
-
-        if (!exerciseId || !exerciseName) return;
-
-        we.exercise_sets?.forEach(set => {
-          if (!set.weight_kg || !set.reps) return;
-
-          const weight = parseFloat(set.weight_kg);
-          const reps = parseInt(set.reps);
-
-          // Calculate estimated 1RM using Epley formula
-          const calculated_max = weight * (1 + reps / 30);
-
-          if (!prsMap[exerciseId] || calculated_max > prsMap[exerciseId].calculated_max) {
-            prsMap[exerciseId] = {
-              exercise_id: exerciseId,
-              exercise_name: exerciseName,
-              weight_kg: weight,
-              reps: reps,
-              calculated_max: calculated_max,
-              workout_date: workout.workout_date,
-              workout_id: workout.id
-            };
-          }
-        });
-      });
-    });
-
-    return Object.values(prsMap).sort((a, b) => b.calculated_max - a.calculated_max);
-  };
-
   // Get week summary
   const getWeekSummary = () => {
     const now = new Date();
@@ -322,7 +284,6 @@ export const WorkoutProvider = ({ children }) => {
     activeWorkout,
     createWorkout,
     deleteWorkout,
-    getPersonalRecords,
     getWeekSummary,
     getMonthSummary,
     refetchWorkouts: fetchWorkouts,

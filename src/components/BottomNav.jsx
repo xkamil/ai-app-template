@@ -25,12 +25,6 @@ const BottomNav = () => {
       label: t('bottomNav.exercises')
     },
     {
-      path: '/stats',
-      icon: '📊',
-      labelKey: 'bottomNav.stats',
-      label: t('bottomNav.stats')
-    },
-    {
       path: '/profile',
       icon: '👤',
       labelKey: 'bottomNav.profile',

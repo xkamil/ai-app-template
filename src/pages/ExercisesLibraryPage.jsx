@@ -31,16 +31,6 @@ const ExercisesLibraryPage = () => {
       );
     }
 
-    // Filter by plan assignment (if 'without_plan' is selected as sortBy)
-    if (sortBy === 'without_plan') {
-      filtered = filtered.filter(exercise => {
-        const hasPlans = workoutPlans.some(plan =>
-          plan.workout_plan_exercises?.some(wpe => wpe.exercise_id === exercise.id)
-        );
-        return !hasPlans;
-      });
-    }
-
     // Calculate workout count for each exercise
     const exercisesWithCount = filtered.map(exercise => {
       const workoutsCount = workouts.filter(workout =>
@@ -274,34 +264,6 @@ const ExercisesLibraryPage = () => {
             {t('exercises.sort.leastUsed')}
           </button>
 
-          <button
-            onClick={() => setSortBy('without_plan')}
-            style={{
-              flex: 1,
-              padding: 'var(--space-2) var(--space-3)',
-              background: sortBy === 'without_plan' ? 'var(--accent-primary)' : 'transparent',
-              border: `1px solid ${sortBy === 'without_plan' ? 'var(--accent-primary)' : 'var(--border-color)'}`,
-              borderRadius: 'var(--radius-md)',
-              color: sortBy === 'without_plan' ? 'white' : 'var(--text-secondary)',
-              fontSize: 'var(--text-sm)',
-              fontWeight: 'var(--font-semibold)',
-              cursor: 'pointer',
-              transition: 'all var(--transition-fast)',
-              whiteSpace: 'nowrap'
-            }}
-            onMouseEnter={(e) => {
-              if (sortBy !== 'without_plan') {
-                e.target.style.borderColor = 'var(--text-secondary)';
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (sortBy !== 'without_plan') {
-                e.target.style.borderColor = 'var(--border-color)';
-              }
-            }}
-          >
-            {t('exercises.filter.withoutPlan')}
-          </button>
         </div>
 
         {/* Loading State */}

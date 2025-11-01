@@ -74,7 +74,6 @@ export default {
     workouts: "Workouts",
     plans: "Plans",
     exercises: "Exercises",
-    stats: "Stats",
     profile: "Profile"
   },
   workouts: {
@@ -251,47 +250,6 @@ export default {
       maxReps: "Max reps",
       maxWeight: "Max weight",
       reps: "reps"
-    }
-  },
-  stats: {
-    title: "Statistics",
-    activity: {
-      title: "Activity",
-      streak: "Streak",
-      workouts: "Workouts",
-      totalTime: "Total time",
-      days: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
-    },
-    prs: {
-      title: "Personal Records",
-      at: "@",
-      reps: "reps",
-      ago: "{time} ago",
-      viewDetails: "View details"
-    },
-    detail: {
-      personalRecord: "Personal Record",
-      achieved: "Achieved: {date}",
-      improvement: "+{diff}kg from previous PR",
-      progress: "Progress (last 3 months)",
-      statistics: "Statistics",
-      totalVolume: "Total volume:",
-      avgWeight: "Average weight:",
-      workoutsCount: "Number of workouts:",
-      lastWorkout: "Last workout:",
-      recordHistory: "Record history"
-    },
-    timeRange: {
-      week: "Last 7 days",
-      month: "Last 30 days",
-      threeMonths: "3 months",
-      year: "Year",
-      all: "All time"
-    },
-    emptyState: {
-      title: "No data yet",
-      subtitle: "Complete your first workout to see your stats and records!",
-      cta: "START WORKOUT"
     }
   },
   plans: {

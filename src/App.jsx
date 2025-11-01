@@ -12,7 +12,6 @@ import PasswordResetPage from './pages/PasswordResetPage'
 import WorkoutsListPage from './pages/WorkoutsListPage'
 import NewWorkoutPage from './pages/NewWorkoutPage'
 import ExercisesLibraryPage from './pages/ExercisesLibraryPage'
-import StatisticsPage from './pages/StatisticsPage'
 import ProfilePage from './pages/ProfilePage'
 import WorkoutPlansPage from './pages/WorkoutPlansPage'
 
@@ -51,14 +50,6 @@ function App() {
                   element={
                     <PrivateRoute>
                       <ExercisesLibraryPage />
-                    </PrivateRoute>
-                  }
-                />
-                <Route
-                  path="/stats"
-                  element={
-                    <PrivateRoute>
-                      <StatisticsPage />
                     </PrivateRoute>
                   }
                 />
