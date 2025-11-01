@@ -231,6 +231,13 @@ export default {
       message: "Are you sure you want to delete \"{name}\"? Your workout history with this exercise will be preserved.",
       cancel: "Cancel",
       confirm: "Delete"
+    },
+    statistics: {
+      title: "Statistics",
+      totalWorkouts: "Total workouts",
+      maxReps: "Max reps",
+      maxWeight: "Max weight",
+      reps: "reps"
     }
   },
   stats: {

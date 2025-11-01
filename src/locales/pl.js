@@ -231,6 +231,13 @@ export default {
       message: "Czy na pewno chcesz usunąć \"{name}\"? Historia treningów z tym ćwiczeniem zostanie zachowana.",
       cancel: "Anuluj",
       confirm: "Usuń"
+    },
+    statistics: {
+      title: "Statystyki",
+      totalWorkouts: "Ilość treningów",
+      maxReps: "Max powtórzeń",
+      maxWeight: "Max obciążenie",
+      reps: "powtórzeń"
     }
   },
   stats: {

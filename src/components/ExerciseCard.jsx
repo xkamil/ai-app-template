@@ -10,6 +10,7 @@ const ExerciseCard = ({ exercise, onEdit, onDelete, onClone }) => {
   const { workouts } = useWorkout();
   const { workoutPlans } = useWorkoutPlan();
   const [showConfirm, setShowConfirm] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   // Format last used date for exercises
   const formatLastUsedDate = (date) => {
@@ -25,6 +26,20 @@ const ExerciseCard = ({ exercise, onEdit, onDelete, onClone }) => {
 
     const daysLabel = days === 1 ? t('plans.day') : t('plans.days');
     return t('exercises.lastUsedDaysAgo', { count: days, days: daysLabel });
+  };
+
+  // Format date for statistics
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString();
+  };
+
+  // Format duration in mm:ss format
+  const formatDuration = (seconds) => {
+    if (!seconds) return null;
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
   // Calculate how many workouts used this exercise
@@ -57,6 +72,51 @@ const ExerciseCard = ({ exercise, onEdit, onDelete, onClone }) => {
     );
   }, [workoutPlans, exercise.id]);
 
+  // Calculate statistics for this exercise
+  const statistics = useMemo(() => {
+    // Collect all sets for this exercise across all workouts
+    const allSets = [];
+    workouts.forEach(workout => {
+      workout.workout_exercises?.forEach(we => {
+        if (we.exercise?.id === exercise.id) {
+          we.exercise_sets?.forEach(set => {
+            allSets.push({
+              ...set,
+              workoutDate: workout.workout_date
+            });
+          });
+        }
+      });
+    });
+
+    if (allSets.length === 0) return null;
+
+    // Find set with maximum reps
+    const maxRepsSet = allSets.reduce((max, set) =>
+      (set.reps || 0) > (max.reps || 0) ? set : max
+    , allSets[0]);
+
+    // Find set with maximum weight
+    const maxWeightSet = allSets.reduce((max, set) =>
+      (set.weight_kg || 0) > (max.weight_kg || 0) ? set : max
+    , allSets[0]);
+
+    return {
+      totalSets: allSets.length,
+      maxReps: {
+        reps: maxRepsSet.reps,
+        weight: maxRepsSet.weight_kg,
+        duration: maxRepsSet.duration_seconds,
+        date: maxRepsSet.workoutDate
+      },
+      maxWeight: {
+        weight: maxWeightSet.weight_kg,
+        reps: maxWeightSet.reps,
+        date: maxWeightSet.workoutDate
+      }
+    };
+  }, [workouts, exercise.id]);
+
   const handleDelete = () => {
     setShowConfirm(true);
   };
@@ -74,6 +134,7 @@ const ExerciseCard = ({ exercise, onEdit, onDelete, onClone }) => {
         cursor: 'pointer',
         transition: 'all var(--transition-base)'
       }}
+      onClick={() => setIsExpanded(!isExpanded)}
     >
       {/* Exercise Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 'var(--space-3)' }}>
@@ -221,6 +282,61 @@ const ExerciseCard = ({ exercise, onEdit, onDelete, onClone }) => {
           🗑️ {t('exercises.actions.delete')}
         </button>
       </div>
+
+      {/* Statistics Section (Collapsible) */}
+      {isExpanded && statistics && (
+        <div style={{
+          marginTop: 'var(--space-4)',
+          paddingTop: 'var(--space-4)',
+          borderTop: '1px solid var(--border-color)'
+        }}>
+          <h4 style={{
+            fontSize: 'var(--text-base)',
+            fontWeight: 'var(--font-semibold)',
+            color: 'var(--text-primary)',
+            margin: 0,
+            marginBottom: 'var(--space-3)'
+          }}>
+            {t('exercises.statistics.title')}
+          </h4>
+
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 'var(--space-2)',
+            fontSize: 'var(--text-sm)',
+            color: 'var(--text-secondary)'
+          }}>
+            {/* Total Workouts */}
+            <div>
+              📊 {t('exercises.statistics.totalWorkouts')}: <strong style={{ color: 'var(--text-primary)' }}>{workoutsCount}</strong>
+            </div>
+
+            {/* Max Reps */}
+            {statistics.maxReps.reps && (
+              <div>
+                🏆 {t('exercises.statistics.maxReps')}: <strong style={{ color: 'var(--text-primary)' }}>{statistics.maxReps.reps}</strong>
+                {statistics.maxReps.weight && <span> @ {statistics.maxReps.weight}kg</span>}
+                {statistics.maxReps.duration && <span> ({formatDuration(statistics.maxReps.duration)})</span>}
+                <span style={{ color: 'var(--text-tertiary)', marginLeft: 'var(--space-2)' }}>
+                  📅 {formatDate(statistics.maxReps.date)}
+                </span>
+              </div>
+            )}
+
+            {/* Max Weight */}
+            {statistics.maxWeight.weight && (
+              <div>
+                💪 {t('exercises.statistics.maxWeight')}: <strong style={{ color: 'var(--text-primary)' }}>{statistics.maxWeight.weight}kg</strong>
+                {statistics.maxWeight.reps && <span> ({statistics.maxWeight.reps} {t('exercises.statistics.reps')})</span>}
+                <span style={{ color: 'var(--text-tertiary)', marginLeft: 'var(--space-2)' }}>
+                  📅 {formatDate(statistics.maxWeight.date)}
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Confirm Delete Modal */}
       <ConfirmModal
