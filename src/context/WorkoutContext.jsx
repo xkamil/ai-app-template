@@ -383,6 +383,53 @@ export const WorkoutProvider = ({ children }) => {
     return bestWorkout;
   };
 
+  // Get last workout for exercise - finds most recent workout with this exercise
+  const getLastWorkoutForExercise = (exerciseId) => {
+    // Sort workouts by date descending (most recent first)
+    const sortedWorkouts = [...workouts].sort((a, b) =>
+      new Date(b.workout_date) - new Date(a.workout_date)
+    );
+
+    for (const workout of sortedWorkouts) {
+      const workoutExercise = workout.workout_exercises?.find(
+        we => we.exercise?.id === exerciseId
+      );
+
+      if (workoutExercise && workoutExercise.exercise_sets?.length > 0) {
+        const sets = [];
+
+        workoutExercise.exercise_sets.forEach(set => {
+          const weight = parseFloat(set.weight_kg) || 0;
+          const reps = parseInt(set.reps) || 0;
+          const duration = parseInt(set.duration_seconds) || null;
+
+          // Skip completely empty sets
+          if (weight === 0 && reps === 0 && !duration) {
+            return;
+          }
+
+          sets.push({
+            set_number: set.set_number,
+            reps: reps > 0 ? reps : null,
+            weight_kg: weight > 0 ? weight : null,
+            duration_seconds: duration,
+            notes: set.notes || ''
+          });
+        });
+
+        if (sets.length > 0) {
+          return {
+            workout_date: workout.workout_date,
+            workout_id: workout.id,
+            sets: sets.sort((a, b) => a.set_number - b.set_number)
+          };
+        }
+      }
+    }
+
+    return null;
+  };
+
   // Load active workout from localStorage on mount
   useEffect(() => {
     const ongoing = loadOngoingWorkout();
@@ -422,6 +469,7 @@ export const WorkoutProvider = ({ children }) => {
     getPersonalRecords,
     getSetHistoryForExercise,
     getBestWorkoutForExercise,
+    getLastWorkoutForExercise,
     refetchWorkouts: fetchWorkouts,
     loadActiveWorkout,
     clearActiveWorkout

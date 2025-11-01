@@ -175,7 +175,7 @@ export default {
       finish: "Zakończ trening",
       finishExercise: "Zakończ ćwiczenie",
       skipExercise: "Pomiń ćwiczenie",
-      unskipExercise: "Odpomiń ćwiczenie",
+      resumeExercise: "Wznów ćwiczenie",
       cancel: "Anuluj trening",
       confirmCancel: "Czy na pewno chcesz anulować trening? Wszystkie dane zostaną utracone.",
       confirmFinishWithSkipped: "Czy na pewno chcesz zakończyć trening? Pominiesz pozostałe {count} ćwiczeń. Zostaną one automatycznie pominięte i nie zapiszą się w historii.",

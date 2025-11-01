@@ -175,7 +175,7 @@ export default {
       finish: "Finish workout",
       finishExercise: "Finish exercise",
       skipExercise: "Skip exercise",
-      unskipExercise: "Unskip exercise",
+      resumeExercise: "Resume exercise",
       cancel: "Cancel workout",
       confirmCancel: "Are you sure you want to cancel the workout? All data will be lost.",
       confirmFinishWithSkipped: "Are you sure you want to finish the workout? You will skip the remaining {count} exercises. They will be automatically skipped and will not be saved in the history.",

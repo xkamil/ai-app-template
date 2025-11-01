@@ -190,99 +190,100 @@ const ExerciseCard = ({ exercise, onEdit, onDelete, onClone }) => {
         </span>
       </div>
 
-      {/* Action Buttons */}
-      <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onEdit(exercise);
-          }}
-          style={{
-            flex: 1,
-            minWidth: '120px',
-            padding: 'var(--space-2) var(--space-3)',
-            background: 'transparent',
-            border: '1px solid var(--accent-primary)',
-            borderRadius: 'var(--radius-md)',
-            color: 'var(--accent-primary)',
-            fontSize: 'var(--text-sm)',
-            fontWeight: 'var(--font-semibold)',
-            cursor: 'pointer',
-            transition: 'all var(--transition-fast)'
-          }}
-          onMouseEnter={(e) => {
-            e.target.style.background = 'var(--accent-primary)';
-            e.target.style.color = 'white';
-          }}
-          onMouseLeave={(e) => {
-            e.target.style.background = 'transparent';
-            e.target.style.color = 'var(--accent-primary)';
-          }}
-        >
-          ✏️ {t('exercises.actions.edit')}
-        </button>
+        {/* Action Buttons */}
+        {isExpanded &&
+            <div style={{display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap'}}>
+                <button
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onEdit(exercise);
+                    }}
+                    style={{
+                        flex: 1,
+                        minWidth: '120px',
+                        padding: 'var(--space-2) var(--space-3)',
+                        background: 'transparent',
+                        border: '1px solid var(--accent-primary)',
+                        borderRadius: 'var(--radius-md)',
+                        color: 'var(--accent-primary)',
+                        fontSize: 'var(--text-sm)',
+                        fontWeight: 'var(--font-semibold)',
+                        cursor: 'pointer',
+                        transition: 'all var(--transition-fast)'
+                    }}
+                    onMouseEnter={(e) => {
+                        e.target.style.background = 'var(--accent-primary)';
+                        e.target.style.color = 'white';
+                    }}
+                    onMouseLeave={(e) => {
+                        e.target.style.background = 'transparent';
+                        e.target.style.color = 'var(--accent-primary)';
+                    }}
+                >
+                    ✏️ {t('exercises.actions.edit')}
+                </button>
 
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onClone(exercise);
-          }}
-          style={{
-            flex: 1,
-            minWidth: '120px',
-            padding: 'var(--space-2) var(--space-3)',
-            background: 'transparent',
-            border: '1px solid var(--text-secondary)',
-            borderRadius: 'var(--radius-md)',
-            color: 'var(--text-secondary)',
-            fontSize: 'var(--text-sm)',
-            fontWeight: 'var(--font-semibold)',
-            cursor: 'pointer',
-            transition: 'all var(--transition-fast)'
-          }}
-          onMouseEnter={(e) => {
-            e.target.style.background = 'var(--text-secondary)';
-            e.target.style.color = 'var(--bg-primary)';
-          }}
-          onMouseLeave={(e) => {
-            e.target.style.background = 'transparent';
-            e.target.style.color = 'var(--text-secondary)';
-          }}
-        >
-          📋 {t('exercises.actions.clone')}
-        </button>
+                <button
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onClone(exercise);
+                    }}
+                    style={{
+                        flex: 1,
+                        minWidth: '120px',
+                        padding: 'var(--space-2) var(--space-3)',
+                        background: 'transparent',
+                        border: '1px solid var(--text-secondary)',
+                        borderRadius: 'var(--radius-md)',
+                        color: 'var(--text-secondary)',
+                        fontSize: 'var(--text-sm)',
+                        fontWeight: 'var(--font-semibold)',
+                        cursor: 'pointer',
+                        transition: 'all var(--transition-fast)'
+                    }}
+                    onMouseEnter={(e) => {
+                        e.target.style.background = 'var(--text-secondary)';
+                        e.target.style.color = 'var(--bg-primary)';
+                    }}
+                    onMouseLeave={(e) => {
+                        e.target.style.background = 'transparent';
+                        e.target.style.color = 'var(--text-secondary)';
+                    }}
+                >
+                    📋 {t('exercises.actions.clone')}
+                </button>
 
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            handleDelete();
-          }}
-          style={{
-            flex: 1,
-            minWidth: '120px',
-            padding: 'var(--space-2) var(--space-3)',
-            background: 'transparent',
-            border: '1px solid var(--danger)',
-            borderRadius: 'var(--radius-md)',
-            color: 'var(--danger)',
-            fontSize: 'var(--text-sm)',
-            fontWeight: 'var(--font-semibold)',
-            cursor: 'pointer',
-            transition: 'all var(--transition-fast)'
-          }}
-          onMouseEnter={(e) => {
-            e.target.style.background = 'var(--danger)';
-            e.target.style.color = 'white';
-          }}
-          onMouseLeave={(e) => {
-            e.target.style.background = 'transparent';
-            e.target.style.color = 'var(--danger)';
-          }}
-        >
-          🗑️ {t('exercises.actions.delete')}
-        </button>
-      </div>
-
+                <button
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        handleDelete();
+                    }}
+                    style={{
+                        flex: 1,
+                        minWidth: '120px',
+                        padding: 'var(--space-2) var(--space-3)',
+                        background: 'transparent',
+                        border: '1px solid var(--danger)',
+                        borderRadius: 'var(--radius-md)',
+                        color: 'var(--danger)',
+                        fontSize: 'var(--text-sm)',
+                        fontWeight: 'var(--font-semibold)',
+                        cursor: 'pointer',
+                        transition: 'all var(--transition-fast)'
+                    }}
+                    onMouseEnter={(e) => {
+                        e.target.style.background = 'var(--danger)';
+                        e.target.style.color = 'white';
+                    }}
+                    onMouseLeave={(e) => {
+                        e.target.style.background = 'transparent';
+                        e.target.style.color = 'var(--danger)';
+                    }}
+                >
+                    🗑️ {t('exercises.actions.delete')}
+                </button>
+            </div>
+        }
       {/* Statistics Section (Collapsible) */}
       {isExpanded && statistics && (
         <div style={{

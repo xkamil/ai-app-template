@@ -151,7 +151,8 @@ const WorkoutPlanCard = ({ plan, onEdit, onDelete, onSelect, onClone, lastWorkou
         </div>
       )}
 
-      {/* Management Buttons - Always Visible */}
+      {/* Management Buttons */}
+        {isExpanded &&
       <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
         <button
           onClick={handleEditClick}
@@ -232,7 +233,7 @@ const WorkoutPlanCard = ({ plan, onEdit, onDelete, onSelect, onClone, lastWorkou
           🗑️ {t('plans.delete')}
         </button>
       </div>
-
+        }
       {/* Exercise List - Visible Only When Expanded */}
       {isExpanded && plan.workout_plan_exercises && plan.workout_plan_exercises.length > 0 && (
         <div style={{
