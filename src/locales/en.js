@@ -3,7 +3,9 @@ export default {
     loading: "Loading...",
     email: "Email address",
     password: "Password",
-    language: "Language"
+    language: "Language",
+    cancel: "Cancel",
+    confirm: "Confirm"
   },
   login: {
     title: "Welcome Back",
@@ -118,7 +120,10 @@ export default {
       delete: "Delete"
     },
     deleteConfirm: {
-      message: "Are you sure you want to delete workout \"{name}\"?"
+      title: "Delete workout?",
+      message: "Are you sure you want to delete workout \"{name}\"?",
+      cancel: "Cancel",
+      confirm: "Delete"
     }
   },
   newWorkout: {
@@ -281,7 +286,12 @@ export default {
     edit: "Edit",
     delete: "Delete",
     clone: "Duplicate",
-    deleteConfirm: "Are you sure you want to delete plan \"{name}\"?",
+    deleteConfirm: {
+      title: "Delete plan?",
+      message: "Are you sure you want to delete plan \"{name}\"?",
+      cancel: "Cancel",
+      confirm: "Delete"
+    },
     deleteError: "Cannot delete plan",
     cloneError: "Cannot duplicate plan",
     lastWorkoutToday: "Last workout today",
@@ -335,7 +345,12 @@ export default {
       deleteSuccess: "Data has been deleted"
     },
     logout: "SIGN OUT",
-    logoutConfirm: "Are you sure you want to sign out?",
+    logoutConfirm: {
+      title: "Sign out?",
+      message: "Are you sure you want to sign out?",
+      cancel: "Cancel",
+      confirm: "Sign out"
+    },
     version: "v1.0.0"
   }
 }

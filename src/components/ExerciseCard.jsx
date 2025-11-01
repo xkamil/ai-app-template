@@ -1,13 +1,15 @@
 import { useLanguage } from '../context/LanguageContext';
 import { useWorkout } from '../context/WorkoutContext';
 import { useWorkoutPlan } from '../context/WorkoutPlanContext';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { getDaysSinceDate } from '../lib/dateUtils';
+import ConfirmModal from './ConfirmModal';
 
 const ExerciseCard = ({ exercise, onEdit, onDelete, onClone }) => {
   const { t } = useLanguage();
   const { workouts } = useWorkout();
   const { workoutPlans } = useWorkoutPlan();
+  const [showConfirm, setShowConfirm] = useState(false);
 
   // Format last used date for exercises
   const formatLastUsedDate = (date) => {
@@ -56,9 +58,12 @@ const ExerciseCard = ({ exercise, onEdit, onDelete, onClone }) => {
   }, [workoutPlans, exercise.id]);
 
   const handleDelete = () => {
-    if (window.confirm(t('exercises.deleteConfirm.message').replace('{name}', exercise.name))) {
-      onDelete(exercise.id);
-    }
+    setShowConfirm(true);
+  };
+
+  const handleConfirmDelete = () => {
+    onDelete(exercise.id);
+    setShowConfirm(false);
   };
 
   return (
@@ -216,6 +221,17 @@ const ExerciseCard = ({ exercise, onEdit, onDelete, onClone }) => {
           🗑️ {t('exercises.actions.delete')}
         </button>
       </div>
+
+      {/* Confirm Delete Modal */}
+      <ConfirmModal
+        show={showConfirm}
+        title={t('exercises.deleteConfirm.title')}
+        message={t('exercises.deleteConfirm.message').replace('{name}', exercise.name)}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setShowConfirm(false)}
+        confirmText={t('exercises.deleteConfirm.confirm')}
+        cancelText={t('exercises.deleteConfirm.cancel')}
+      />
     </div>
   );
 };

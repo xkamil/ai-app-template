@@ -1,14 +1,19 @@
 import { useState } from 'react';
 import { useLanguage } from '../context/LanguageContext';
+import ConfirmModal from './ConfirmModal';
 
 const WorkoutCard = ({ workout, onDelete }) => {
   const { t } = useLanguage();
   const [isExpanded, setIsExpanded] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const handleDelete = () => {
-    if (window.confirm(t('workouts.deleteConfirm.message').replace('{name}', workout.name || formatDate(workout.workout_date)))) {
-      onDelete(workout.id);
-    }
+    setShowConfirm(true);
+  };
+
+  const handleConfirmDelete = () => {
+    onDelete(workout.id);
+    setShowConfirm(false);
   };
 
   const formatDate = (dateString) => {
@@ -222,6 +227,17 @@ const WorkoutCard = ({ workout, onDelete }) => {
           </button>
         </div>
       )}
+
+      {/* Confirm Delete Modal */}
+      <ConfirmModal
+        show={showConfirm}
+        title={t('workouts.deleteConfirm.title')}
+        message={t('workouts.deleteConfirm.message').replace('{name}', workout.name || formatDate(workout.workout_date))}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setShowConfirm(false)}
+        confirmText={t('workouts.deleteConfirm.confirm')}
+        cancelText={t('workouts.deleteConfirm.cancel')}
+      />
     </div>
   );
 };

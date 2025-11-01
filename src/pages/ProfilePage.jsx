@@ -1,23 +1,29 @@
+import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useNavigate } from 'react-router-dom';
 import BottomNav from '../components/BottomNav';
 import LanguageSwitcher from '../components/LanguageSwitcher';
+import ConfirmModal from '../components/ConfirmModal';
 
 const ProfilePage = () => {
   const { user, signOut } = useAuth();
   const { t } = useLanguage();
   const navigate = useNavigate();
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
-  const handleSignOut = async () => {
-    if (window.confirm(t('profile.logoutConfirm'))) {
-      try {
-        await signOut();
-        navigate('/');
-      } catch (error) {
-        console.error('Error signing out:', error);
-      }
+  const handleSignOut = () => {
+    setShowLogoutConfirm(true);
+  };
+
+  const handleConfirmLogout = async () => {
+    try {
+      await signOut();
+      navigate('/');
+    } catch (error) {
+      console.error('Error signing out:', error);
     }
+    setShowLogoutConfirm(false);
   };
 
   const formatDate = (dateString) => {
@@ -119,6 +125,18 @@ const ProfilePage = () => {
           {t('profile.version')} • Made with 💪
         </div>
       </div>
+
+      {/* Confirm Logout Modal */}
+      <ConfirmModal
+        show={showLogoutConfirm}
+        title={t('profile.logoutConfirm.title')}
+        message={t('profile.logoutConfirm.message')}
+        onConfirm={handleConfirmLogout}
+        onCancel={() => setShowLogoutConfirm(false)}
+        confirmText={t('profile.logoutConfirm.confirm')}
+        cancelText={t('profile.logoutConfirm.cancel')}
+        isDanger={false}
+      />
 
       <BottomNav />
     </div>

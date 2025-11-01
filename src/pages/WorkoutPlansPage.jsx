@@ -6,6 +6,7 @@ import { useWorkout } from '../context/WorkoutContext';
 import BottomNav from '../components/BottomNav';
 import WorkoutPlanCard from '../components/WorkoutPlanCard';
 import WorkoutPlanModal from '../components/WorkoutPlanModal';
+import ConfirmModal from '../components/ConfirmModal';
 
 const WorkoutPlansPage = () => {
   const { t } = useLanguage();
@@ -16,6 +17,7 @@ const WorkoutPlansPage = () => {
   const [showModal, setShowModal] = useState(false);
   const [editingPlan, setEditingPlan] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [confirmDelete, setConfirmDelete] = useState(null);
 
   // Function to get the last workout date for a plan
   const getLastWorkoutDate = (planId) => {
@@ -74,12 +76,17 @@ const WorkoutPlansPage = () => {
   };
 
   const handleDeletePlan = async (plan) => {
-    if (window.confirm(t('plans.deleteConfirm').replace('{name}', plan.name))) {
-      const result = await deleteWorkoutPlan(plan.id);
+    setConfirmDelete(plan);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (confirmDelete) {
+      const result = await deleteWorkoutPlan(confirmDelete.id);
       if (result.error) {
         alert(t('plans.deleteError'));
       }
     }
+    setConfirmDelete(null);
   };
 
   const handleClonePlan = async (plan) => {
@@ -263,6 +270,17 @@ const WorkoutPlansPage = () => {
         }}
         onSave={handleSavePlan}
         editingPlan={editingPlan}
+      />
+
+      {/* Confirm Delete Modal */}
+      <ConfirmModal
+        show={!!confirmDelete}
+        title={t('plans.deleteConfirm.title')}
+        message={t('plans.deleteConfirm.message').replace('{name}', confirmDelete?.name || '')}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setConfirmDelete(null)}
+        confirmText={t('plans.deleteConfirm.confirm')}
+        cancelText={t('plans.deleteConfirm.cancel')}
       />
 
       <BottomNav />

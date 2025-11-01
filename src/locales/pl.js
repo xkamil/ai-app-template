@@ -3,7 +3,9 @@ export default {
     loading: "Ładowanie...",
     email: "Adres e-mail",
     password: "Hasło",
-    language: "Język"
+    language: "Język",
+    cancel: "Anuluj",
+    confirm: "Potwierdź"
   },
   login: {
     title: "Witaj ponownie",
@@ -118,7 +120,10 @@ export default {
       delete: "Usuń"
     },
     deleteConfirm: {
-      message: "Czy na pewno chcesz usunąć trening \"{name}\"?"
+      title: "Usuń trening?",
+      message: "Czy na pewno chcesz usunąć trening \"{name}\"?",
+      cancel: "Anuluj",
+      confirm: "Usuń"
     }
   },
   newWorkout: {
@@ -281,7 +286,12 @@ export default {
     edit: "Edytuj",
     delete: "Usuń",
     clone: "Duplikuj",
-    deleteConfirm: "Czy na pewno chcesz usunąć plan \"{name}\"?",
+    deleteConfirm: {
+      title: "Usuń plan?",
+      message: "Czy na pewno chcesz usunąć plan \"{name}\"?",
+      cancel: "Anuluj",
+      confirm: "Usuń"
+    },
     deleteError: "Nie można usunąć planu",
     cloneError: "Nie można zduplikować planu",
     lastWorkoutToday: "Ostatni trening dzisiaj",
@@ -335,7 +345,12 @@ export default {
       deleteSuccess: "Dane zostały usunięte"
     },
     logout: "WYLOGUJ",
-    logoutConfirm: "Czy na pewno chcesz się wylogować?",
+    logoutConfirm: {
+      title: "Wylogować się?",
+      message: "Czy na pewno chcesz się wylogować?",
+      cancel: "Anuluj",
+      confirm: "Wyloguj"
+    },
     version: "v1.0.0"
   }
 }
