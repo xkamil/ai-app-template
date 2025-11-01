@@ -1,11 +1,13 @@
 import { useLanguage } from '../context/LanguageContext';
 import { useWorkout } from '../context/WorkoutContext';
+import { useWorkoutPlan } from '../context/WorkoutPlanContext';
 import { useMemo } from 'react';
 import { getDaysSinceDate } from '../lib/dateUtils';
 
 const ExerciseCard = ({ exercise, onEdit, onDelete, onClone }) => {
   const { t } = useLanguage();
   const { workouts } = useWorkout();
+  const { workoutPlans } = useWorkoutPlan();
 
   // Format last used date for exercises
   const formatLastUsedDate = (date) => {
@@ -45,6 +47,13 @@ const ExerciseCard = ({ exercise, onEdit, onDelete, onClone }) => {
 
     return sortedWorkouts[0].workout_date;
   }, [workouts, exercise.id]);
+
+  // Find which plans contain this exercise
+  const assignedPlans = useMemo(() => {
+    return workoutPlans.filter(plan =>
+      plan.workout_plan_exercises?.some(wpe => wpe.exercise_id === exercise.id)
+    );
+  }, [workoutPlans, exercise.id]);
 
   const handleDelete = () => {
     if (window.confirm(t('exercises.deleteConfirm.message').replace('{name}', exercise.name))) {
@@ -87,25 +96,32 @@ const ExerciseCard = ({ exercise, onEdit, onDelete, onClone }) => {
         </p>
       )}
 
-      {/* Meta Info - Stats */}
+      {/* Meta Info - All stats in one line */}
       <div style={{
         display: 'flex',
-        gap: 'var(--space-4)',
+        gap: 'var(--space-3)',
         fontSize: 'var(--text-sm)',
-        color: 'var(--text-tertiary)',
-        marginBottom: 'var(--space-2)'
-      }}>
-        <span>📊 {t('exercises.workoutsCount', { count: workoutsCount })}</span>
-      </div>
-
-      {/* Last Used Date */}
-      <div style={{
-        fontSize: 'var(--text-sm)',
-        color: lastUsedDate ? 'var(--text-secondary)' : 'var(--text-tertiary)',
         marginBottom: 'var(--space-2)',
-        fontStyle: lastUsedDate ? 'normal' : 'italic'
+        flexWrap: 'wrap'
       }}>
-        📅 {formatLastUsedDate(lastUsedDate)}
+        <span style={{
+          color: workoutsCount === 0 ? 'var(--danger)' : 'var(--text-tertiary)',
+          fontStyle: workoutsCount === 0 ? 'italic' : 'normal'
+        }}>
+          📊 {t('exercises.workoutsCount', { count: workoutsCount })}
+        </span>
+        <span style={{
+          color: assignedPlans.length === 0 ? 'var(--danger)' : 'var(--text-secondary)',
+          fontStyle: assignedPlans.length === 0 ? 'italic' : 'normal'
+        }}>
+          📋 {assignedPlans.length > 0 ? assignedPlans.map(p => p.name).join(', ') : t('exercises.noPlan')}
+        </span>
+        <span style={{
+          color: !lastUsedDate ? 'var(--danger)' : 'var(--text-secondary)',
+          fontStyle: !lastUsedDate ? 'italic' : 'normal'
+        }}>
+          📅 {formatLastUsedDate(lastUsedDate)}
+        </span>
       </div>
 
       {/* Action Buttons */}

@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { useExercise } from '../context/ExerciseContext';
 import { useWorkout } from '../context/WorkoutContext';
+import { useWorkoutPlan } from '../context/WorkoutPlanContext';
 import BottomNav from '../components/BottomNav';
 import AddExerciseModal from '../components/AddExerciseModal';
 import ExerciseCard from '../components/ExerciseCard';
@@ -10,6 +11,7 @@ const ExercisesLibraryPage = () => {
   const { t } = useLanguage();
   const { exercises, loading, deleteExercise, cloneExercise } = useExercise();
   const { workouts } = useWorkout();
+  const { workoutPlans } = useWorkoutPlan();
 
   const [showModal, setShowModal] = useState(false);
   const [editingExercise, setEditingExercise] = useState(null);
@@ -27,6 +29,16 @@ const ExercisesLibraryPage = () => {
         ex.name.toLowerCase().includes(query) ||
         (ex.description && ex.description.toLowerCase().includes(query))
       );
+    }
+
+    // Filter by plan assignment (if 'without_plan' is selected as sortBy)
+    if (sortBy === 'without_plan') {
+      filtered = filtered.filter(exercise => {
+        const hasPlans = workoutPlans.some(plan =>
+          plan.workout_plan_exercises?.some(wpe => wpe.exercise_id === exercise.id)
+        );
+        return !hasPlans;
+      });
     }
 
     // Calculate workout count for each exercise
@@ -51,7 +63,7 @@ const ExercisesLibraryPage = () => {
     });
 
     return sorted;
-  }, [exercises, searchQuery, sortBy, workouts]);
+  }, [exercises, searchQuery, sortBy, workouts, workoutPlans]);
 
   const handleAddNew = () => {
     setEditingExercise(null);
@@ -138,12 +150,12 @@ const ExercisesLibraryPage = () => {
           />
         </div>
 
-        {/* Sort Buttons */}
+        {/* Sort and Filter Buttons */}
         <div style={{
           display: 'flex',
           gap: 'var(--space-2)',
           marginBottom: 'var(--space-3)',
-          flexWrap: 'nowrap'
+          flexWrap: 'wrap'
         }}>
           <button
             onClick={() => setSortBy('newest')}
@@ -230,6 +242,35 @@ const ExercisesLibraryPage = () => {
             }}
           >
             {t('exercises.sort.leastUsed')}
+          </button>
+
+          <button
+            onClick={() => setSortBy('without_plan')}
+            style={{
+              flex: 1,
+              padding: 'var(--space-2) var(--space-3)',
+              background: sortBy === 'without_plan' ? 'var(--accent-primary)' : 'transparent',
+              border: `1px solid ${sortBy === 'without_plan' ? 'var(--accent-primary)' : 'var(--border-color)'}`,
+              borderRadius: 'var(--radius-md)',
+              color: sortBy === 'without_plan' ? 'white' : 'var(--text-secondary)',
+              fontSize: 'var(--text-sm)',
+              fontWeight: 'var(--font-semibold)',
+              cursor: 'pointer',
+              transition: 'all var(--transition-fast)',
+              whiteSpace: 'nowrap'
+            }}
+            onMouseEnter={(e) => {
+              if (sortBy !== 'without_plan') {
+                e.target.style.borderColor = 'var(--text-secondary)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (sortBy !== 'without_plan') {
+                e.target.style.borderColor = 'var(--border-color)';
+              }
+            }}
+          >
+            {t('exercises.filter.withoutPlan')}
           </button>
         </div>
 

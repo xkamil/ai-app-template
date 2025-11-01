@@ -187,13 +187,17 @@ export default {
     pr: "PR: {weight}kg @ {reps} reps",
     lastUsed: "Last used: {time}",
     workoutsCount: "{count} workouts",
-    lastUsedToday: "Last used today",
-    lastUsedDaysAgo: "Last used {count} {days} ago",
-    neverUsed: "Last used: never",
+    lastUsedToday: "today",
+    lastUsedDaysAgo: "{count} {days} ago",
+    neverUsed: "never",
+    noPlan: "No plan",
     sort: {
       newest: "Newest",
       mostUsed: "Most workouts",
       leastUsed: "Least workouts"
+    },
+    filter: {
+      withoutPlan: "Without plan"
     },
     actions: {
       edit: "Edit",
