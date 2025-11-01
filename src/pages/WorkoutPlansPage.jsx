@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { useWorkoutPlan } from '../context/WorkoutPlanContext';
+import { useWorkout } from '../context/WorkoutContext';
 import BottomNav from '../components/BottomNav';
 import WorkoutPlanCard from '../components/WorkoutPlanCard';
 import WorkoutPlanModal from '../components/WorkoutPlanModal';
@@ -10,9 +11,39 @@ const WorkoutPlansPage = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
   const { workoutPlans, loading, createWorkoutPlan, updateWorkoutPlan, deleteWorkoutPlan, clonePlan } = useWorkoutPlan();
+  const { workouts } = useWorkout();
 
   const [showModal, setShowModal] = useState(false);
   const [editingPlan, setEditingPlan] = useState(null);
+
+  // Function to get the last workout date for a plan
+  const getLastWorkoutDate = (planId) => {
+    const planWorkouts = workouts.filter(w => w.workout_plan_id === planId);
+    if (planWorkouts.length === 0) return null;
+
+    // Find the most recent workout
+    const sortedWorkouts = planWorkouts.sort((a, b) =>
+      new Date(b.workout_date) - new Date(a.workout_date)
+    );
+
+    return sortedWorkouts[0].workout_date;
+  };
+
+  // Sort plans by last workout date (oldest/never used first)
+  const sortedPlans = useMemo(() => {
+    return [...workoutPlans].sort((a, b) => {
+      const dateA = getLastWorkoutDate(a.id);
+      const dateB = getLastWorkoutDate(b.id);
+
+      // Plans without workouts come first
+      if (!dateA && !dateB) return 0;
+      if (!dateA) return -1;
+      if (!dateB) return 1;
+
+      // Otherwise sort by date (oldest first)
+      return new Date(dateA) - new Date(dateB);
+    });
+  }, [workoutPlans, workouts]);
 
   // Debug logging
   console.log('WorkoutPlansPage: workoutPlans:', workoutPlans);
@@ -139,7 +170,7 @@ const WorkoutPlansPage = () => {
           </div>
         ) : (
           <>
-            {workoutPlans.map(plan => (
+            {sortedPlans.map(plan => (
               <WorkoutPlanCard
                 key={plan.id}
                 plan={plan}
@@ -147,6 +178,7 @@ const WorkoutPlansPage = () => {
                 onDelete={handleDeletePlan}
                 onSelect={handleStartWorkout}
                 onClone={handleClonePlan}
+                lastWorkoutDate={getLastWorkoutDate(plan.id)}
               />
             ))}
           </>

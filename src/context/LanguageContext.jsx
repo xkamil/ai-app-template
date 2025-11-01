@@ -49,7 +49,7 @@ export const LanguageProvider = ({ children }) => {
   }
 
   // Translation function
-  const t = (key) => {
+  const t = (key, params = {}) => {
     const keys = key.split('.')
     let value = translations[currentLanguage]
 
@@ -70,7 +70,16 @@ export const LanguageProvider = ({ children }) => {
       }
     }
 
-    return value || key
+    let result = value || key
+
+    // Replace placeholders with params
+    if (typeof result === 'string' && params) {
+      Object.keys(params).forEach(paramKey => {
+        result = result.replace(`{${paramKey}}`, params[paramKey])
+      })
+    }
+
+    return result
   }
 
   const value = {

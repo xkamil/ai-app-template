@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useLanguage } from '../context/LanguageContext';
+import { formatLastWorkoutDate } from '../lib/dateUtils';
 
-const WorkoutPlanCard = ({ plan, onEdit, onDelete, onSelect, onClone }) => {
+const WorkoutPlanCard = ({ plan, onEdit, onDelete, onSelect, onClone, lastWorkoutDate }) => {
   const { t } = useLanguage();
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -12,8 +13,7 @@ const WorkoutPlanCard = ({ plan, onEdit, onDelete, onSelect, onClone }) => {
     }
   };
 
-  const handleToggleExpand = (e) => {
-    e.stopPropagation();
+  const handleCardClick = () => {
     setIsExpanded(!isExpanded);
   };
 
@@ -41,10 +41,12 @@ const WorkoutPlanCard = ({ plan, onEdit, onDelete, onSelect, onClone }) => {
   return (
     <div
       className="dark-card"
+      onClick={handleCardClick}
       style={{
         marginBottom: 'var(--space-3)',
         transition: 'all var(--transition-base)',
-        borderLeft: `4px solid ${plan.color || '#FF6B35'}`
+        borderLeft: `4px solid ${plan.color || '#FF6B35'}`,
+        cursor: 'pointer'
       }}
     >
       {/* Header Section */}
@@ -86,7 +88,7 @@ const WorkoutPlanCard = ({ plan, onEdit, onDelete, onSelect, onClone }) => {
         gap: 'var(--space-3)',
         fontSize: 'var(--text-sm)',
         color: 'var(--text-tertiary)',
-        marginBottom: 'var(--space-3)'
+        marginBottom: 'var(--space-2)'
       }}>
         <span>
           💪 {plan.workout_plan_exercises?.length || 0} {t('plans.exercises')}
@@ -98,37 +100,14 @@ const WorkoutPlanCard = ({ plan, onEdit, onDelete, onSelect, onClone }) => {
         )}
       </div>
 
-      {/* Action Buttons - Always Visible */}
-      <div style={{ display: 'flex', gap: 'var(--space-2)', marginBottom: isExpanded ? 'var(--space-3)' : 0 }}>
-        <button
-          onClick={handleStartWorkout}
-          className="gradient-button"
-          style={{ flex: 1 }}
-        >
-          🏋️ {t('plans.startWorkout')}
-        </button>
-        <button
-          onClick={handleToggleExpand}
-          style={{
-            padding: 'var(--space-3)',
-            background: 'var(--bg-tertiary)',
-            border: '1px solid var(--border-color)',
-            borderRadius: 'var(--radius-md)',
-            color: 'var(--text-primary)',
-            fontSize: 'var(--text-base)',
-            cursor: 'pointer',
-            minWidth: '50px',
-            transition: 'all var(--transition-fast)'
-          }}
-          onMouseEnter={(e) => {
-            e.target.style.background = 'var(--bg-secondary)';
-          }}
-          onMouseLeave={(e) => {
-            e.target.style.background = 'var(--bg-tertiary)';
-          }}
-        >
-          {isExpanded ? '▲' : '▼'}
-        </button>
+      {/* Last Workout Date */}
+      <div style={{
+        fontSize: 'var(--text-sm)',
+        color: lastWorkoutDate ? 'var(--text-secondary)' : 'var(--text-tertiary)',
+        marginBottom: 'var(--space-2)',
+        fontStyle: lastWorkoutDate ? 'normal' : 'italic'
+      }}>
+        📅 {formatLastWorkoutDate(lastWorkoutDate, t)}
       </div>
 
       {/* Expanded Details */}
@@ -138,6 +117,18 @@ const WorkoutPlanCard = ({ plan, onEdit, onDelete, onSelect, onClone }) => {
           paddingTop: 'var(--space-3)',
           borderTop: '1px solid var(--border-color)'
         }}>
+          {/* Start Training Button */}
+          <button
+            onClick={handleStartWorkout}
+            className="gradient-button"
+            style={{
+              width: '100%',
+              marginBottom: 'var(--space-3)'
+            }}
+          >
+            🏋️ {t('plans.startWorkout')}
+          </button>
+
           {/* Full Exercise List */}
           {plan.workout_plan_exercises && plan.workout_plan_exercises.length > 0 && (
             <div style={{ marginBottom: 'var(--space-3)' }}>

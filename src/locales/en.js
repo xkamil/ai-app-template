@@ -269,6 +269,11 @@ export default {
     deleteConfirm: "Are you sure you want to delete plan \"{name}\"?",
     deleteError: "Cannot delete plan",
     cloneError: "Cannot duplicate plan",
+    lastWorkoutToday: "Last workout today",
+    lastWorkoutDaysAgo: "Last workout {count} {days} ago",
+    neverUsed: "Last workout: never",
+    day: "day",
+    days: "days",
     emptyState: {
       title: "No workout plans",
       subtitle: "Create your first workout plan!",

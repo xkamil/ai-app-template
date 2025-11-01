@@ -269,6 +269,11 @@ export default {
     deleteConfirm: "Czy na pewno chcesz usunąć plan \"{name}\"?",
     deleteError: "Nie można usunąć planu",
     cloneError: "Nie można zduplikować planu",
+    lastWorkoutToday: "Ostatni trening dzisiaj",
+    lastWorkoutDaysAgo: "Ostatni trening {count} {days} temu",
+    neverUsed: "Ostatni trening: nigdy",
+    day: "dzień",
+    days: "dni",
     emptyState: {
       title: "Brak planów treningowych",
       subtitle: "Utwórz swój pierwszy plan treningowy!",
