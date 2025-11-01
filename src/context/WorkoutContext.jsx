@@ -288,6 +288,101 @@ export const WorkoutProvider = ({ children }) => {
     return Object.values(prsMap).sort((a, b) => b.calculated_max - a.calculated_max);
   };
 
+  // Get set history for exercise - finds best volume for each set number
+  const getSetHistoryForExercise = (exerciseId) => {
+    const setHistory = {};
+
+    workouts.forEach(workout => {
+      workout.workout_exercises?.forEach(we => {
+        if (we.exercise?.id !== exerciseId) return;
+
+        we.exercise_sets?.forEach(set => {
+          const setNumber = set.set_number;
+          const weight = parseFloat(set.weight_kg) || 0;
+          const reps = parseInt(set.reps) || 0;
+          const duration = parseInt(set.duration_seconds) || null;
+
+          // Only track sets that have actual data (weight > 0 OR reps > 0 OR duration > 0)
+          // This ensures we don't suggest empty sets as historical data
+          if (weight === 0 && reps === 0 && !duration) {
+            return; // Skip empty sets
+          }
+
+          // Calculate volume: if there's weight, use weight * reps, otherwise just reps
+          // This allows bodyweight exercises (weight=0) to still have volume
+          const volume = weight > 0 ? weight * reps : reps;
+
+          // Track the set with highest volume for each set_number
+          if (!setHistory[setNumber] || volume > setHistory[setNumber].volume) {
+            setHistory[setNumber] = {
+              set_number: setNumber,
+              weight_kg: weight > 0 ? weight : null,
+              reps: reps > 0 ? reps : null,
+              duration_seconds: duration,
+              volume: volume,
+              workout_date: workout.workout_date
+            };
+          }
+        });
+      });
+    });
+
+    return setHistory;
+  };
+
+  // Get best workout for exercise - finds workout with highest total volume
+  const getBestWorkoutForExercise = (exerciseId) => {
+    let bestWorkout = null;
+    let maxVolume = 0;
+
+    workouts.forEach(workout => {
+      workout.workout_exercises?.forEach(we => {
+        if (we.exercise?.id !== exerciseId) return;
+
+        // Calculate total volume for this exercise in this workout
+        let totalVolume = 0;
+        const sets = [];
+
+        we.exercise_sets?.forEach(set => {
+          const weight = parseFloat(set.weight_kg) || 0;
+          const reps = parseInt(set.reps) || 0;
+          const duration = parseInt(set.duration_seconds) || null;
+
+          // Skip completely empty sets (no weight, no reps, no duration)
+          if (weight === 0 && reps === 0 && !duration) {
+            return;
+          }
+
+          // Calculate volume: if there's weight, use weight * reps, otherwise just reps
+          // This allows bodyweight exercises (weight=0) to still have volume
+          const setVolume = weight > 0 ? weight * reps : reps;
+          totalVolume += setVolume;
+
+          sets.push({
+            set_number: set.set_number,
+            reps: reps > 0 ? reps : null,
+            weight_kg: weight > 0 ? weight : null,
+            duration_seconds: duration,
+            notes: set.notes || ''
+          });
+        });
+
+        // Track the workout with highest total volume
+        if (totalVolume > maxVolume && sets.length > 0) {
+          maxVolume = totalVolume;
+          bestWorkout = {
+            workout_date: workout.workout_date,
+            workout_id: workout.id,
+            total_volume: totalVolume,
+            sets: sets.sort((a, b) => a.set_number - b.set_number)
+          };
+        }
+      });
+    });
+
+    return bestWorkout;
+  };
+
   // Load active workout from localStorage on mount
   useEffect(() => {
     const ongoing = loadOngoingWorkout();
@@ -325,6 +420,8 @@ export const WorkoutProvider = ({ children }) => {
     getWeekSummary,
     getMonthSummary,
     getPersonalRecords,
+    getSetHistoryForExercise,
+    getBestWorkoutForExercise,
     refetchWorkouts: fetchWorkouts,
     loadActiveWorkout,
     clearActiveWorkout

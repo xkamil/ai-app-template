@@ -1,9 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
 import { useLanguage } from '../context/LanguageContext';
+import { useWorkout } from '../context/WorkoutContext';
 import ConfirmModal from './ConfirmModal';
 
 const LogSetsStep = ({ selectedExercises, workoutData, onUpdateWorkoutData, onBack, onFinish, onCancel, planName, currentExerciseIndex, onExerciseIndexChange, exerciseStatus, onExerciseStatusChange }) => {
   const { t } = useLanguage();
+  const { getBestWorkoutForExercise } = useWorkout();
   const exerciseNavRef = useRef(null);
   const exerciseButtonRefs = useRef([]);
 
@@ -49,11 +51,21 @@ const LogSetsStep = ({ selectedExercises, workoutData, onUpdateWorkoutData, onBa
   };
 
   const addSet = () => {
-    const lastSet = exerciseSets[exerciseSets.length - 1];
+    // Get the set number for the new set
+    const newSetNumber = exerciseSets.length + 1;
+
+    // Get best workout for this exercise
+    const bestWorkout = getBestWorkoutForExercise(currentExercise.id);
+
+    // Find the set with this set_number in the best workout
+    const historicalSet = bestWorkout?.sets?.find(s => s.set_number === newSetNumber);
+
+    // If this set number exists in best workout, use those values
+    // Otherwise, use empty values
     const newSet = {
-      reps: lastSet?.reps || '',
-      weight_kg: lastSet?.weight_kg || '',
-      duration_seconds: '',
+      reps: historicalSet?.reps ?? '',
+      weight_kg: historicalSet?.weight_kg ?? '',
+      duration_seconds: historicalSet?.duration_seconds ?? '',
       notes: ''
     };
 
@@ -102,6 +114,17 @@ const LogSetsStep = ({ selectedExercises, workoutData, onUpdateWorkoutData, onBa
   };
 
   const handleFinishExercise = () => {
+    // Validate that all sets have at least 1 rep
+    const hasInvalidSets = exerciseSets.some(set => {
+      const reps = parseInt(set.reps) || 0;
+      return reps < 1;
+    });
+
+    if (hasInvalidSets) {
+      alert(t('newWorkout.step2.validationError') || 'Każda seria musi mieć co najmniej 1 powtórzenie');
+      return;
+    }
+
     // Mark exercise as completed (removes skipped status if present)
     onExerciseStatusChange({
       ...exerciseStatus,

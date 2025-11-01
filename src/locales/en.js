@@ -5,7 +5,8 @@ export default {
     password: "Password",
     language: "Language",
     cancel: "Cancel",
-    confirm: "Confirm"
+    confirm: "Confirm",
+    volume: "Volume"
   },
   login: {
     title: "Welcome Back",
@@ -179,7 +180,8 @@ export default {
       confirmCancel: "Are you sure you want to cancel the workout? All data will be lost.",
       confirmFinishWithSkipped: "Are you sure you want to finish the workout? You will skip the remaining {count} exercises. They will be automatically skipped and will not be saved in the history.",
       exerciseNotes: "Notes",
-      exerciseNotesPlaceholder: "Exercise notes..."
+      exerciseNotesPlaceholder: "Exercise notes...",
+      validationError: "Each set must have at least 1 rep"
     },
     step3: {
       title: "Workout completed!",

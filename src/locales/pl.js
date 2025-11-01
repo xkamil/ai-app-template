@@ -5,7 +5,8 @@ export default {
     password: "Hasło",
     language: "Język",
     cancel: "Anuluj",
-    confirm: "Potwierdź"
+    confirm: "Potwierdź",
+    volume: "Objętość"
   },
   login: {
     title: "Witaj ponownie",
@@ -165,8 +166,8 @@ export default {
       nameLabel: "Nazwa (opcjonalnie)",
       namePlaceholder: "np. Upper Body A",
       set: "Seria {number}",
-      reps: "Reps",
-      weight: "Weight",
+      reps: "Powtórzenia",
+      weight: "Waga",
       duration: "Czas",
       done: "Gotowe",
       addSet: "Dodaj serię",
@@ -179,7 +180,8 @@ export default {
       confirmCancel: "Czy na pewno chcesz anulować trening? Wszystkie dane zostaną utracone.",
       confirmFinishWithSkipped: "Czy na pewno chcesz zakończyć trening? Pominiesz pozostałe {count} ćwiczeń. Zostaną one automatycznie pominięte i nie zapiszą się w historii.",
       exerciseNotes: "Notatki",
-      exerciseNotesPlaceholder: "Notatki do ćwiczenia..."
+      exerciseNotesPlaceholder: "Notatki do ćwiczenia...",
+      validationError: "Każda seria musi mieć co najmniej 1 powtórzenie"
     },
     step3: {
       title: "Trening zakończony!",

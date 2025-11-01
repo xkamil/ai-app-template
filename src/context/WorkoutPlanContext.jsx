@@ -15,7 +15,7 @@ export const useWorkoutPlan = () => {
 
 export const WorkoutPlanProvider = ({ children }) => {
   const { user } = useAuth();
-  const { getPersonalRecords } = useWorkout();
+  const { getPersonalRecords, getSetHistoryForExercise, getBestWorkoutForExercise } = useWorkout();
   const [workoutPlans, setWorkoutPlans] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -295,48 +295,31 @@ export const WorkoutPlanProvider = ({ children }) => {
     }
   };
 
-  // Get suggested sets for an exercise based on PRs
+  // Get suggested sets for an exercise based on best workout (highest total volume)
   const getSuggestedSetsForExercise = (exerciseId, suggestedSetCount = 3) => {
-    const personalRecords = getPersonalRecords();
-    const exercisePR = personalRecords.find(pr => pr.exercise_id === exerciseId);
+    // Find the workout with highest total volume for this exercise
+    const bestWorkout = getBestWorkoutForExercise(exerciseId);
 
-    if (!exercisePR) {
-      // No PR found, return default empty sets
+    if (!bestWorkout || !bestWorkout.sets || bestWorkout.sets.length === 0) {
+      // No historical data - return empty sets
       return Array.from({ length: suggestedSetCount }, (_, i) => ({
         set_number: i + 1,
-        reps: null,
-        weight_kg: null,
-        duration_seconds: null,
+        reps: '',
+        weight_kg: '',
+        duration_seconds: '',
         notes: ''
       }));
     }
 
-    // Generate sets based on PR with progressive overload pattern
-    // Set 1: 90% of PR weight at PR reps
-    // Set 2: 95% of PR weight at PR reps
-    // Set 3: 100% of PR weight at PR reps
-    // Additional sets: repeat 100%
-    const prWeight = parseFloat(exercisePR.weight_kg);
-    const prReps = parseInt(exercisePR.reps);
-
-    return Array.from({ length: suggestedSetCount }, (_, i) => {
-      let weight = prWeight;
-
-      if (i === 0) {
-        weight = prWeight * 0.90; // Warmup set
-      } else if (i === 1) {
-        weight = prWeight * 0.95; // Working set
-      }
-      // else: working set at 100%
-
-      return {
-        set_number: i + 1,
-        reps: prReps,
-        weight_kg: Math.round(weight * 10) / 10, // Round to 1 decimal
-        duration_seconds: null,
-        notes: ''
-      };
-    });
+    // Use the exact sets from the best workout
+    // Convert null to empty string for input fields
+    return bestWorkout.sets.map((set, index) => ({
+      set_number: index + 1,
+      reps: set.reps ?? '',
+      weight_kg: set.weight_kg ?? '',
+      duration_seconds: set.duration_seconds ?? '',
+      notes: ''
+    }));
   };
 
   // Fetch data when user changes
