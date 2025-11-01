@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { useExercise } from '../context/ExerciseContext';
+import { useWorkoutPlan } from '../context/WorkoutPlanContext';
 
 const WorkoutPlanModal = ({ isOpen, onClose, onSave, editingPlan }) => {
   const { t } = useLanguage();
   const { exercises } = useExercise();
+  const { workoutPlans } = useWorkoutPlan();
 
   const [planName, setPlanName] = useState('');
   const [planColor, setPlanColor] = useState('#FF6B35');
@@ -22,6 +24,16 @@ const WorkoutPlanModal = ({ isOpen, onClose, onSave, editingPlan }) => {
     '#48C9B0', // Aqua
     '#C44569'  // Dark Pink
   ];
+
+  // Get plan names that contain this exercise (excluding current plan being edited)
+  const getPlansForExercise = (exerciseId) => {
+    return workoutPlans
+      .filter(plan =>
+        plan.id !== editingPlan?.id && // Exclude current plan
+        plan.workout_plan_exercises?.some(pe => pe.exercise_id === exerciseId)
+      )
+      .map(plan => plan.name);
+  };
 
   useEffect(() => {
     if (editingPlan) {
@@ -167,9 +179,19 @@ const WorkoutPlanModal = ({ isOpen, onClose, onSave, editingPlan }) => {
     onClose();
   };
 
-  const availableExercises = exercises.filter(ex =>
-    !selectedExercises.find(se => se.exercise_id === ex.id)
-  );
+  const availableExercises = exercises
+    .filter(ex => !selectedExercises.find(se => se.exercise_id === ex.id))
+    .map(ex => ({
+      ...ex,
+      assignedPlans: getPlansForExercise(ex.id)
+    }))
+    .sort((a, b) => {
+      // Unassigned exercises first
+      if (a.assignedPlans.length === 0 && b.assignedPlans.length > 0) return -1;
+      if (a.assignedPlans.length > 0 && b.assignedPlans.length === 0) return 1;
+      // Then alphabetically by name
+      return a.name.localeCompare(b.name);
+    });
 
   if (!isOpen) return null;
 
@@ -414,6 +436,7 @@ const WorkoutPlanModal = ({ isOpen, onClose, onSave, editingPlan }) => {
             {availableExercises.map(exercise => (
               <option key={exercise.id} value={exercise.id}>
                 {exercise.name}
+                {exercise.assignedPlans.length > 0 && ` 📋 ${exercise.assignedPlans.join(', ')}`}
               </option>
             ))}
           </select>
