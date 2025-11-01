@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from './AuthContext';
+import { loadOngoingWorkout, clearOngoingWorkout } from '../lib/workoutStorage';
 
 const WorkoutContext = createContext();
 
@@ -17,6 +18,7 @@ export const WorkoutProvider = ({ children }) => {
   const [workouts, setWorkouts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [activeWorkout, setActiveWorkout] = useState(null);
 
   // Fetch workouts with exercises and sets
   const fetchWorkouts = async (limit = 20) => {
@@ -259,12 +261,38 @@ export const WorkoutProvider = ({ children }) => {
       return sum + (workout.workout_exercises.length * 3);
     }, 0);
 
+    // Calculate total volume (weight × reps)
+    const totalVolume = thisMonthWorkouts.reduce((sum, workout) => {
+      if (!workout.workout_exercises) return sum;
+
+      const workoutVolume = workout.workout_exercises.reduce((exerciseSum, we) => {
+        if (!we.workout_sets) return exerciseSum;
+
+        const setsVolume = we.workout_sets.reduce((setSum, set) => {
+          const weight = parseFloat(set.weight_kg) || 0;
+          const reps = parseInt(set.reps) || 0;
+          return setSum + (weight * reps);
+        }, 0);
+
+        return exerciseSum + setsVolume;
+      }, 0);
+
+      return sum + workoutVolume;
+    }, 0);
+
     return {
       count: thisMonthWorkouts.length,
       totalHours: (totalMinutes / 60).toFixed(1),
+      totalVolume: Math.round(totalVolume),
       workouts: thisMonthWorkouts
     };
   };
+
+  // Load active workout from localStorage on mount
+  useEffect(() => {
+    const ongoing = loadOngoingWorkout();
+    setActiveWorkout(ongoing);
+  }, []);
 
   // Fetch data when user changes
   useEffect(() => {
@@ -275,16 +303,31 @@ export const WorkoutProvider = ({ children }) => {
     }
   }, [user]);
 
+  // Functions to manage active workout
+  const loadActiveWorkout = () => {
+    const ongoing = loadOngoingWorkout();
+    setActiveWorkout(ongoing);
+    return ongoing;
+  };
+
+  const clearActiveWorkout = () => {
+    clearOngoingWorkout();
+    setActiveWorkout(null);
+  };
+
   const value = {
     workouts,
     loading,
     error,
+    activeWorkout,
     createWorkout,
     deleteWorkout,
     getPersonalRecords,
     getWeekSummary,
     getMonthSummary,
-    refetchWorkouts: fetchWorkouts
+    refetchWorkouts: fetchWorkouts,
+    loadActiveWorkout,
+    clearActiveWorkout
   };
 
   return (

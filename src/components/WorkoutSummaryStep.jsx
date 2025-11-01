@@ -1,6 +1,6 @@
 import { useLanguage } from '../context/LanguageContext';
 
-const WorkoutSummaryStep = ({ workoutData, selectedExercises, onSave, saving }) => {
+const WorkoutSummaryStep = ({ workoutData, selectedExercises, onSave, saving, exerciseStatus = {} }) => {
   const { t } = useLanguage();
 
   // Calculate total sets
@@ -137,19 +137,28 @@ const WorkoutSummaryStep = ({ workoutData, selectedExercises, onSave, saving }) 
         {selectedExercises.map((exercise, index) => {
           const exerciseData = workoutData.exercises[exercise.id];
           const sets = exerciseData?.sets || [];
+          const isSkipped = exerciseStatus[exercise.id] === 'skipped';
 
           return (
-            <div key={exercise.id} className="dark-card" style={{ marginBottom: 'var(--space-3)' }}>
+            <div key={exercise.id} className="dark-card" style={{
+              marginBottom: 'var(--space-3)',
+              opacity: isSkipped ? 0.5 : 1
+            }}>
               <div style={{
                 fontSize: 'var(--text-base)',
                 fontWeight: 'var(--font-semibold)',
-                color: 'var(--text-primary)',
-                marginBottom: 'var(--space-2)'
+                color: isSkipped ? 'var(--text-tertiary)' : 'var(--text-primary)',
+                marginBottom: isSkipped ? 0 : 'var(--space-2)',
+                textDecoration: isSkipped ? 'line-through' : 'none',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 'var(--space-2)'
               }}>
                 {index + 1}. 🏋️ {exercise.name}
+                {isSkipped && <span>⊘</span>}
               </div>
 
-              {sets.length > 0 && (
+              {!isSkipped && sets.length > 0 && (
                 <div style={{
                   display: 'flex',
                   flexDirection: 'column',
@@ -180,7 +189,7 @@ const WorkoutSummaryStep = ({ workoutData, selectedExercises, onSave, saving }) 
                 </div>
               )}
 
-              {exerciseData?.notes && (
+              {!isSkipped && exerciseData?.notes && (
                 <div style={{
                   fontSize: 'var(--text-sm)',
                   color: 'var(--text-tertiary)',

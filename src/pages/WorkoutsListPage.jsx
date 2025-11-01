@@ -1,14 +1,19 @@
+import { useState } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { useWorkout } from '../context/WorkoutContext';
 import { useNavigate } from 'react-router-dom';
 import BottomNav from '../components/BottomNav';
 import MonthSummaryCard from '../components/MonthSummaryCard';
 import WorkoutCard from '../components/WorkoutCard';
+import ConfirmModal from '../components/ConfirmModal';
 
 const WorkoutsListPage = () => {
   const { t } = useLanguage();
-  const { workouts, loading, deleteWorkout, getMonthSummary } = useWorkout();
+  const { workouts, loading, deleteWorkout, getMonthSummary, activeWorkout, clearActiveWorkout } = useWorkout();
   const navigate = useNavigate();
+
+  // Modal state
+  const [showCancelActiveWorkoutModal, setShowCancelActiveWorkoutModal] = useState(false);
 
   const monthSummary = getMonthSummary();
 
@@ -21,6 +26,19 @@ const WorkoutsListPage = () => {
 
   const handleNewWorkout = () => {
     navigate('/plans');
+  };
+
+  const handleContinueWorkout = () => {
+    navigate('/workout/new');
+  };
+
+  const handleCancelActiveWorkout = () => {
+    setShowCancelActiveWorkoutModal(true);
+  };
+
+  const confirmCancelActiveWorkout = () => {
+    setShowCancelActiveWorkoutModal(false);
+    clearActiveWorkout();
   };
 
   return (
@@ -67,6 +85,102 @@ const WorkoutsListPage = () => {
       <div className="page-content">
         {/* Month Summary */}
         <MonthSummaryCard summary={monthSummary} />
+
+        {/* Ongoing Workout Card */}
+        {activeWorkout && (
+          <div
+            className="dark-card"
+            style={{
+              marginBottom: 'var(--space-4)',
+              background: 'linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%)',
+              border: '2px solid var(--accent-primary)',
+              position: 'relative',
+              overflow: 'hidden'
+            }}
+          >
+            {/* Animated background indicator */}
+            <div style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              height: '4px',
+              background: 'var(--accent-gradient)',
+              animation: 'pulse 2s ease-in-out infinite'
+            }} />
+
+            <div style={{ position: 'relative', zIndex: 1 }}>
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'flex-start',
+                marginBottom: 'var(--space-3)'
+              }}>
+                <div>
+                  <h3 style={{
+                    fontSize: 'var(--text-lg)',
+                    fontWeight: 'var(--font-bold)',
+                    color: 'var(--accent-primary)',
+                    marginBottom: 'var(--space-1)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 'var(--space-2)'
+                  }}>
+                    <span style={{ fontSize: '24px' }}>🏋️</span>
+                    {t('workouts.ongoing.title')}
+                  </h3>
+                  <p style={{
+                    fontSize: 'var(--text-base)',
+                    color: 'var(--text-primary)',
+                    fontWeight: 'var(--font-semibold)',
+                    marginBottom: 'var(--space-1)'
+                  }}>
+                    {activeWorkout.selectedPlan?.name}
+                  </p>
+                  <p style={{
+                    fontSize: 'var(--text-sm)',
+                    color: 'var(--text-tertiary)'
+                  }}>
+                    💪 {Object.keys(activeWorkout.workoutData?.exercises || {}).length} {t('plans.exercises')}
+                  </p>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div style={{
+                display: 'flex',
+                gap: 'var(--space-2)'
+              }}>
+                <button
+                  onClick={handleContinueWorkout}
+                  className="gradient-button"
+                  style={{
+                    flex: 1,
+                    padding: 'var(--space-3)'
+                  }}
+                >
+                  {t('workouts.ongoing.continue')}
+                </button>
+                <button
+                  onClick={handleCancelActiveWorkout}
+                  style={{
+                    flex: 1,
+                    padding: 'var(--space-3)',
+                    background: 'transparent',
+                    border: '1px solid var(--danger)',
+                    borderRadius: 'var(--radius-md)',
+                    color: 'var(--danger)',
+                    fontSize: 'var(--text-sm)',
+                    fontWeight: 'var(--font-semibold)',
+                    cursor: 'pointer'
+                  }}
+                >
+                  {t('workouts.ongoing.cancel')}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Loading State */}
         {loading ? (
@@ -116,6 +230,18 @@ const WorkoutsListPage = () => {
       </div>
 
       <BottomNav />
+
+      {/* Cancel Active Workout Confirmation Modal */}
+      <ConfirmModal
+        show={showCancelActiveWorkoutModal}
+        title={t('workouts.ongoing.cancel')}
+        message={t('workouts.ongoing.confirmCancel')}
+        onConfirm={confirmCancelActiveWorkout}
+        onCancel={() => setShowCancelActiveWorkoutModal(false)}
+        confirmText={t('common.confirm')}
+        cancelText={t('common.cancel')}
+        isDanger={true}
+      />
     </div>
   );
 };

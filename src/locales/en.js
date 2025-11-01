@@ -116,6 +116,12 @@ export default {
       subtitle: "Start your first workout!",
       cta: "START YOUR FIRST WORKOUT"
     },
+    ongoing: {
+      title: "Workout in progress",
+      continue: "Continue",
+      cancel: "Cancel",
+      confirmCancel: "Are you sure you want to cancel the workout? All data will be lost."
+    },
     actions: {
       delete: "Delete"
     },
@@ -156,6 +162,7 @@ export default {
     step2: {
       title: "Log sets",
       progress: "Step 3/4",
+      workoutFromPlan: "Workout from plan:",
       nameLabel: "Name (optional)",
       namePlaceholder: "e.g. Upper Body A",
       set: "Set {number}",
@@ -165,7 +172,13 @@ export default {
       done: "Done",
       addSet: "Add set",
       lastTime: "Last: {sets}×{reps} @ {weight}kg",
-      finish: "FINISH WORKOUT"
+      finish: "Finish workout",
+      finishExercise: "Finish exercise",
+      skipExercise: "Skip exercise",
+      unskipExercise: "Unskip exercise",
+      cancel: "Cancel workout",
+      confirmCancel: "Are you sure you want to cancel the workout? All data will be lost.",
+      confirmFinishWithSkipped: "Are you sure you want to finish the workout? You will skip the remaining {count} exercises. They will be automatically skipped and will not be saved in the history."
     },
     step3: {
       title: "Workout completed!",

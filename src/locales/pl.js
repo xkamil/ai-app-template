@@ -116,6 +116,12 @@ export default {
       subtitle: "Rozpocznij swój pierwszy trening!",
       cta: "START YOUR FIRST WORKOUT"
     },
+    ongoing: {
+      title: "Trening w toku",
+      continue: "Kontynuuj",
+      cancel: "Anuluj",
+      confirmCancel: "Czy na pewno chcesz anulować trening? Wszystkie dane zostaną utracone."
+    },
     actions: {
       delete: "Usuń"
     },
@@ -156,6 +162,7 @@ export default {
     step2: {
       title: "Loguj serie",
       progress: "Krok 3/4",
+      workoutFromPlan: "Trening z planu:",
       nameLabel: "Nazwa (opcjonalnie)",
       namePlaceholder: "np. Upper Body A",
       set: "Seria {number}",
@@ -165,7 +172,13 @@ export default {
       done: "Gotowe",
       addSet: "Dodaj serię",
       lastTime: "Ostatnio: {sets}×{reps} @ {weight}kg",
-      finish: "ZAKOŃCZ TRENING"
+      finish: "Zakończ trening",
+      finishExercise: "Zakończ ćwiczenie",
+      skipExercise: "Pomiń ćwiczenie",
+      unskipExercise: "Odpomiń ćwiczenie",
+      cancel: "Anuluj trening",
+      confirmCancel: "Czy na pewno chcesz anulować trening? Wszystkie dane zostaną utracone.",
+      confirmFinishWithSkipped: "Czy na pewno chcesz zakończyć trening? Pominiesz pozostałe {count} ćwiczeń. Zostaną one automatycznie pominięte i nie zapiszą się w historii."
     },
     step3: {
       title: "Trening zakończony!",

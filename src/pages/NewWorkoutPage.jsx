@@ -7,12 +7,13 @@ import PlanSelectionStep from '../components/PlanSelectionStep';
 import ExerciseSelectionStep from '../components/ExerciseSelectionStep';
 import LogSetsStep from '../components/LogSetsStep';
 import WorkoutSummaryStep from '../components/WorkoutSummaryStep';
+import { saveOngoingWorkout, loadOngoingWorkout } from '../lib/workoutStorage';
 
 const NewWorkoutPage = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { createWorkout } = useWorkout();
+  const { createWorkout, clearActiveWorkout } = useWorkout();
   const { workoutPlans, getSuggestedSetsForExercise } = useWorkoutPlan();
 
   const [step, setStep] = useState(0); // 0: Select Plan, 1: Select Exercises, 2: Log Sets, 3: Summary
@@ -23,6 +24,8 @@ const NewWorkoutPage = () => {
     notes: '',
     exercises: {} // { exerciseId: { exercise, notes, sets: [] } }
   });
+  const [currentExerciseIndex, setCurrentExerciseIndex] = useState(0);
+  const [exerciseStatus, setExerciseStatus] = useState({}); // { exerciseId: 'completed' | 'skipped' }
   const [saving, setSaving] = useState(false);
 
   const handleSelectPlan = (plan) => {
@@ -59,16 +62,40 @@ const NewWorkoutPage = () => {
     setStep(2);
   };
 
-  // Load plan from URL if planId is provided (skip plan selection)
+  // Load ongoing workout from localStorage on mount
   useEffect(() => {
-    const planId = searchParams.get('planId');
-    if (planId && workoutPlans.length > 0) {
-      const plan = workoutPlans.find(p => p.id === planId);
-      if (plan) {
-        handleSelectPlan(plan);
+    const ongoing = loadOngoingWorkout();
+    if (ongoing && workoutPlans.length > 0) {
+      // Restore ongoing workout
+      setWorkoutData(ongoing.workoutData);
+      setSelectedPlan(ongoing.selectedPlan);
+      setCurrentExerciseIndex(ongoing.currentExerciseIndex || 0);
+      setExerciseStatus(ongoing.exerciseStatus || {});
+
+      // Reconstruct selectedExercises from workoutData
+      const exercises = Object.values(ongoing.workoutData.exercises).map(ex => ex.exercise);
+      setSelectedExercises(exercises);
+
+      // Go directly to logging step
+      setStep(2);
+    } else {
+      // Load plan from URL if planId is provided (skip plan selection)
+      const planId = searchParams.get('planId');
+      if (planId && workoutPlans.length > 0) {
+        const plan = workoutPlans.find(p => p.id === planId);
+        if (plan) {
+          handleSelectPlan(plan);
+        }
       }
     }
-  }, [searchParams, workoutPlans, getSuggestedSetsForExercise]);
+  }, [workoutPlans]);
+
+  // Save to localStorage whenever workout data changes (during step 2)
+  useEffect(() => {
+    if (step === 2 && selectedPlan) {
+      saveOngoingWorkout(workoutData, selectedPlan, currentExerciseIndex, exerciseStatus);
+    }
+  }, [workoutData, selectedPlan, currentExerciseIndex, exerciseStatus, step]);
 
   const handleToggleExercise = (exercise) => {
     setSelectedExercises(prev => {
@@ -123,17 +150,26 @@ const NewWorkoutPage = () => {
     setStep(3);
   };
 
+  const handleCancelWorkout = () => {
+    // Clear localStorage and active workout state, then navigate back to workouts list
+    clearActiveWorkout();
+    navigate('/workouts');
+  };
+
   const handleSaveWorkout = async () => {
     setSaving(true);
 
     try {
+      // Filter out skipped exercises
+      const exercisesToSave = selectedExercises.filter(exercise => exerciseStatus[exercise.id] !== 'skipped');
+
       // Prepare workout data for API
       const workoutPayload = {
-        name: workoutData.name || null,
+        name: selectedPlan?.name || workoutData.name || null,
         notes: workoutData.notes || null,
         workout_date: new Date().toISOString(),
         workout_plan_id: selectedPlan?.id || null,
-        exercises: selectedExercises.map((exercise, index) => {
+        exercises: exercisesToSave.map((exercise, index) => {
           const exerciseData = workoutData.exercises[exercise.id];
           return {
             exercise_id: exercise.id,
@@ -158,6 +194,8 @@ const NewWorkoutPage = () => {
         alert(result.error);
         setSaving(false);
       } else {
+        // Clear ongoing workout from localStorage and state
+        clearActiveWorkout();
         // Success! Navigate to workouts list
         navigate('/workouts');
       }
@@ -192,6 +230,12 @@ const NewWorkoutPage = () => {
           onUpdateWorkoutData={setWorkoutData}
           onBack={handleBackToSelection}
           onFinish={handleFinishLogging}
+          onCancel={handleCancelWorkout}
+          planName={selectedPlan?.name || ''}
+          currentExerciseIndex={currentExerciseIndex}
+          onExerciseIndexChange={setCurrentExerciseIndex}
+          exerciseStatus={exerciseStatus}
+          onExerciseStatusChange={setExerciseStatus}
         />
       )}
 
@@ -201,6 +245,7 @@ const NewWorkoutPage = () => {
           selectedExercises={selectedExercises}
           onSave={handleSaveWorkout}
           saving={saving}
+          exerciseStatus={exerciseStatus}
         />
       )}
     </div>
