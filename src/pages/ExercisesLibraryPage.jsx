@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { useExercise } from '../context/ExerciseContext';
+import { useWorkout } from '../context/WorkoutContext';
 import BottomNav from '../components/BottomNav';
 import AddExerciseModal from '../components/AddExerciseModal';
 import ExerciseCard from '../components/ExerciseCard';
@@ -8,12 +9,14 @@ import ExerciseCard from '../components/ExerciseCard';
 const ExercisesLibraryPage = () => {
   const { t } = useLanguage();
   const { exercises, loading, deleteExercise, cloneExercise } = useExercise();
+  const { workouts } = useWorkout();
 
   const [showModal, setShowModal] = useState(false);
   const [editingExercise, setEditingExercise] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState('newest');
 
-  // Filter exercises
+  // Filter and sort exercises
   const filteredExercises = useMemo(() => {
     let filtered = exercises;
 
@@ -26,8 +29,29 @@ const ExercisesLibraryPage = () => {
       );
     }
 
-    return filtered;
-  }, [exercises, searchQuery]);
+    // Calculate workout count for each exercise
+    const exercisesWithCount = filtered.map(exercise => {
+      const workoutsCount = workouts.filter(workout =>
+        workout.workout_exercises?.some(we => we.exercise?.id === exercise.id)
+      ).length;
+      return { ...exercise, workoutsCount };
+    });
+
+    // Sort based on selected option
+    const sorted = [...exercisesWithCount].sort((a, b) => {
+      switch (sortBy) {
+        case 'most_used':
+          return b.workoutsCount - a.workoutsCount;
+        case 'least_used':
+          return a.workoutsCount - b.workoutsCount;
+        case 'newest':
+        default:
+          return new Date(b.created_at) - new Date(a.created_at);
+      }
+    });
+
+    return sorted;
+  }, [exercises, searchQuery, sortBy, workouts]);
 
   const handleAddNew = () => {
     setEditingExercise(null);
@@ -112,6 +136,101 @@ const ExercisesLibraryPage = () => {
               fontSize: 'var(--text-base)'
             }}
           />
+        </div>
+
+        {/* Sort Buttons */}
+        <div style={{
+          display: 'flex',
+          gap: 'var(--space-2)',
+          marginBottom: 'var(--space-3)',
+          flexWrap: 'nowrap'
+        }}>
+          <button
+            onClick={() => setSortBy('newest')}
+            style={{
+              flex: 1,
+              padding: 'var(--space-2) var(--space-3)',
+              background: sortBy === 'newest' ? 'var(--accent-primary)' : 'transparent',
+              border: `1px solid ${sortBy === 'newest' ? 'var(--accent-primary)' : 'var(--border-color)'}`,
+              borderRadius: 'var(--radius-md)',
+              color: sortBy === 'newest' ? 'white' : 'var(--text-secondary)',
+              fontSize: 'var(--text-sm)',
+              fontWeight: 'var(--font-semibold)',
+              cursor: 'pointer',
+              transition: 'all var(--transition-fast)',
+              whiteSpace: 'nowrap'
+            }}
+            onMouseEnter={(e) => {
+              if (sortBy !== 'newest') {
+                e.target.style.borderColor = 'var(--text-secondary)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (sortBy !== 'newest') {
+                e.target.style.borderColor = 'var(--border-color)';
+              }
+            }}
+          >
+            {t('exercises.sort.newest')}
+          </button>
+
+          <button
+            onClick={() => setSortBy('most_used')}
+            style={{
+              flex: 1,
+              padding: 'var(--space-2) var(--space-3)',
+              background: sortBy === 'most_used' ? 'var(--accent-primary)' : 'transparent',
+              border: `1px solid ${sortBy === 'most_used' ? 'var(--accent-primary)' : 'var(--border-color)'}`,
+              borderRadius: 'var(--radius-md)',
+              color: sortBy === 'most_used' ? 'white' : 'var(--text-secondary)',
+              fontSize: 'var(--text-sm)',
+              fontWeight: 'var(--font-semibold)',
+              cursor: 'pointer',
+              transition: 'all var(--transition-fast)',
+              whiteSpace: 'nowrap'
+            }}
+            onMouseEnter={(e) => {
+              if (sortBy !== 'most_used') {
+                e.target.style.borderColor = 'var(--text-secondary)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (sortBy !== 'most_used') {
+                e.target.style.borderColor = 'var(--border-color)';
+              }
+            }}
+          >
+            {t('exercises.sort.mostUsed')}
+          </button>
+
+          <button
+            onClick={() => setSortBy('least_used')}
+            style={{
+              flex: 1,
+              padding: 'var(--space-2) var(--space-3)',
+              background: sortBy === 'least_used' ? 'var(--accent-primary)' : 'transparent',
+              border: `1px solid ${sortBy === 'least_used' ? 'var(--accent-primary)' : 'var(--border-color)'}`,
+              borderRadius: 'var(--radius-md)',
+              color: sortBy === 'least_used' ? 'white' : 'var(--text-secondary)',
+              fontSize: 'var(--text-sm)',
+              fontWeight: 'var(--font-semibold)',
+              cursor: 'pointer',
+              transition: 'all var(--transition-fast)',
+              whiteSpace: 'nowrap'
+            }}
+            onMouseEnter={(e) => {
+              if (sortBy !== 'least_used') {
+                e.target.style.borderColor = 'var(--text-secondary)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (sortBy !== 'least_used') {
+                e.target.style.borderColor = 'var(--border-color)';
+              }
+            }}
+          >
+            {t('exercises.sort.leastUsed')}
+          </button>
         </div>
 
         {/* Loading State */}

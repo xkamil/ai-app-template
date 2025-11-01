@@ -187,6 +187,14 @@ export default {
     pr: "PR: {weight}kg @ {reps} reps",
     lastUsed: "Ostatnio: {time}",
     workoutsCount: "{count} treningów",
+    lastUsedToday: "Ostatnio wykonane dzisiaj",
+    lastUsedDaysAgo: "Ostatnio wykonane {count} {days} temu",
+    neverUsed: "Ostatnio wykonane: nigdy",
+    sort: {
+      newest: "Najnowsze",
+      mostUsed: "Najwięcej treningów",
+      leastUsed: "Najmniej treningów"
+    },
     actions: {
       edit: "Edytuj",
       stats: "Statystyki",
