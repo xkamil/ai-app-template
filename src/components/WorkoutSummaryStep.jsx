@@ -168,8 +168,8 @@ const WorkoutSummaryStep = ({ workoutData, selectedExercises, onSave, saving, ex
                   {sets.map((set, setIndex) => {
                     const parts = [];
                     if (set.reps) parts.push(`${set.reps} reps`);
-                    if (set.weight_kg) parts.push(`${set.weight_kg}kg`);
-                    if (set.duration_seconds) parts.push(`${set.duration_seconds}s`);
+                    if (exercise.weight_units && set.weight_kg > 0) parts.push(`${set.weight_kg}kg`);
+                    if (exercise.time_units && set.duration_seconds > 0) parts.push(`${set.duration_seconds}s`);
 
                     return (
                       <div

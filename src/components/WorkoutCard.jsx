@@ -154,13 +154,26 @@ const WorkoutCard = ({ workout, onDelete }) => {
                     gap: 'var(--space-2)',
                     flexWrap: 'wrap'
                   }}>
-                    {we.exercise_sets.map((set, setIndex) => (
-                      <span key={set.id}>
-                        {set.weight_kg ? `${set.weight_kg}kg` : ''}{set.weight_kg && set.reps ? ' × ' : ''}{set.reps ? `${set.reps}` : ''}
-                        {set.duration_seconds ? `${set.duration_seconds}s` : ''}
-                        {setIndex < we.exercise_sets.length - 1 ? ',' : ''}
-                      </span>
-                    ))}
+                    {we.exercise_sets.map((set, setIndex) => {
+                      const showWeight = we.exercise?.weight_units && set.weight_kg > 0;
+                      const showDuration = we.exercise?.time_units && set.duration_seconds > 0;
+
+                      // Build the display string: reps × weight × duration
+                      let displayText = set.reps ? `${set.reps}` : '';
+                      if (showWeight) {
+                        displayText += ` × ${set.weight_kg}kg`;
+                      }
+                      if (showDuration) {
+                        displayText += ` × ${set.duration_seconds}s`;
+                      }
+
+                      return (
+                        <span key={set.id}>
+                          {displayText}
+                          {setIndex < we.exercise_sets.length - 1 ? ',' : ''}
+                        </span>
+                      );
+                    })}
                   </div>
                 )}
 

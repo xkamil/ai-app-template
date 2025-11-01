@@ -316,8 +316,8 @@ const ExerciseCard = ({ exercise, onEdit, onDelete, onClone }) => {
             {statistics.maxReps.reps && (
               <div>
                 🏆 {t('exercises.statistics.maxReps')}: <strong style={{ color: 'var(--text-primary)' }}>{statistics.maxReps.reps}</strong>
-                {statistics.maxReps.weight && <span> @ {statistics.maxReps.weight}kg</span>}
-                {statistics.maxReps.duration && <span> ({formatDuration(statistics.maxReps.duration)})</span>}
+                {exercise.weight_units && statistics.maxReps.weight > 0 && <span> @ {statistics.maxReps.weight}kg</span>}
+                {exercise.time_units && statistics.maxReps.duration > 0 && <span> ({formatDuration(statistics.maxReps.duration)})</span>}
                 <span style={{ color: 'var(--text-tertiary)', marginLeft: 'var(--space-2)' }}>
                   📅 {formatDate(statistics.maxReps.date)}
                 </span>
@@ -325,7 +325,7 @@ const ExerciseCard = ({ exercise, onEdit, onDelete, onClone }) => {
             )}
 
             {/* Max Weight */}
-            {statistics.maxWeight.weight && (
+            {exercise.weight_units && statistics.maxWeight.weight > 0 && (
               <div>
                 💪 {t('exercises.statistics.maxWeight')}: <strong style={{ color: 'var(--text-primary)' }}>{statistics.maxWeight.weight}kg</strong>
                 {statistics.maxWeight.reps && <span> ({statistics.maxWeight.reps} {t('exercises.statistics.reps')})</span>}

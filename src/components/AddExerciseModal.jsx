@@ -11,6 +11,8 @@ const AddExerciseModal = ({ show, onClose, exercise = null }) => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [selectedPlanId, setSelectedPlanId] = useState('');
+  const [weightUnits, setWeightUnits] = useState(false);
+  const [timeUnits, setTimeUnits] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -21,6 +23,8 @@ const AddExerciseModal = ({ show, onClose, exercise = null }) => {
     if (exercise) {
       setName(exercise.name || '');
       setDescription(exercise.description || '');
+      setWeightUnits(exercise.weight_units || false);
+      setTimeUnits(exercise.time_units || false);
 
       // Find which plan this exercise belongs to
       const assignedPlan = workoutPlans.find(plan =>
@@ -31,6 +35,8 @@ const AddExerciseModal = ({ show, onClose, exercise = null }) => {
       setName('');
       setDescription('');
       setSelectedPlanId('');
+      setWeightUnits(false);
+      setTimeUnits(false);
     }
     setError('');
   }, [exercise, show, workoutPlans]);
@@ -48,7 +54,9 @@ const AddExerciseModal = ({ show, onClose, exercise = null }) => {
 
     const exerciseData = {
       name: name.trim(),
-      description: description.trim() || null
+      description: description.trim() || null,
+      weight_units: weightUnits,
+      time_units: timeUnits
     };
 
     // Save/update exercise first
@@ -105,6 +113,8 @@ const AddExerciseModal = ({ show, onClose, exercise = null }) => {
       setName('');
       setDescription('');
       setSelectedPlanId('');
+      setWeightUnits(false);
+      setTimeUnits(false);
       setError('');
       onClose();
     }
@@ -224,6 +234,59 @@ const AddExerciseModal = ({ show, onClose, exercise = null }) => {
                 rows={3}
                 style={{ resize: 'vertical' }}
               />
+            </div>
+
+            {/* Unit Checkboxes */}
+            <div style={{ marginBottom: 'var(--space-4)' }}>
+              <label
+                style={{
+                  display: 'block',
+                  fontSize: 'var(--text-sm)',
+                  fontWeight: 'var(--font-medium)',
+                  color: 'var(--text-primary)',
+                  marginBottom: 'var(--space-2)'
+                }}
+              >
+                📊 {t('exercises.addModal.unitsLabel') || 'Jednostki'}
+              </label>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+                <label
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 'var(--space-2)',
+                    cursor: 'pointer',
+                    color: 'var(--text-secondary)'
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={weightUnits}
+                    onChange={(e) => setWeightUnits(e.target.checked)}
+                    disabled={loading}
+                    style={{ cursor: 'pointer' }}
+                  />
+                  <span>🏋️ {t('exercises.addModal.weightUnitsLabel') || 'Używa wagi'}</span>
+                </label>
+                <label
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 'var(--space-2)',
+                    cursor: 'pointer',
+                    color: 'var(--text-secondary)'
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={timeUnits}
+                    onChange={(e) => setTimeUnits(e.target.checked)}
+                    disabled={loading}
+                    style={{ cursor: 'pointer' }}
+                  />
+                  <span>⏱️ {t('exercises.addModal.timeUnitsLabel') || 'Używa czasu'}</span>
+                </label>
+              </div>
             </div>
 
             {/* Plan Selection */}

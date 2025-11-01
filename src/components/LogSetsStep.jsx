@@ -37,6 +37,14 @@ const LogSetsStep = ({ selectedExercises, workoutData, onUpdateWorkoutData, onBa
     const updatedSets = [...exerciseSets];
     updatedSets[setIndex] = { ...updatedSets[setIndex], [field]: value };
 
+    // Force 0 for unused units
+    if (!currentExercise.weight_units) {
+      updatedSets[setIndex].weight_kg = 0;
+    }
+    if (!currentExercise.time_units) {
+      updatedSets[setIndex].duration_seconds = 0;
+    }
+
     onUpdateWorkoutData({
       ...workoutData,
       exercises: {
@@ -64,8 +72,8 @@ const LogSetsStep = ({ selectedExercises, workoutData, onUpdateWorkoutData, onBa
     // Otherwise, use empty values
     const newSet = {
       reps: historicalSet?.reps ?? '',
-      weight_kg: historicalSet?.weight_kg ?? '',
-      duration_seconds: historicalSet?.duration_seconds ?? '',
+      weight_kg: currentExercise.weight_units ? (historicalSet?.weight_kg ?? '') : 0,
+      duration_seconds: currentExercise.time_units ? (historicalSet?.duration_seconds ?? '') : 0,
       notes: ''
     };
 
@@ -352,7 +360,11 @@ const LogSetsStep = ({ selectedExercises, workoutData, onUpdateWorkoutData, onBa
 
               <div style={{
                 display: 'grid',
-                gridTemplateColumns: '1fr 1fr 1fr',
+                gridTemplateColumns: currentExercise.weight_units && currentExercise.time_units
+                  ? '1fr 1fr 1fr'
+                  : currentExercise.weight_units || currentExercise.time_units
+                    ? '1fr 1fr'
+                    : '1fr',
                 gap: 'var(--space-2)'
               }}>
                 <div>
@@ -377,50 +389,54 @@ const LogSetsStep = ({ selectedExercises, workoutData, onUpdateWorkoutData, onBa
                   />
                 </div>
 
-                <div>
-                  <label style={{
-                    fontSize: 'var(--text-xs)',
-                    color: 'var(--text-tertiary)',
-                    display: 'block',
-                    marginBottom: 'var(--space-1)'
-                  }}>
-                    {t('newWorkout.step2.weight')} (kg)
-                  </label>
-                  <input
-                    type="number"
-                    step="0.5"
-                    className="dark-input"
-                    placeholder="60"
-                    value={set.weight_kg}
-                    onChange={(e) => updateSet(setIndex, 'weight_kg', e.target.value)}
-                    style={{
-                      fontSize: 'var(--text-base)',
-                      padding: 'var(--space-2)'
-                    }}
-                  />
-                </div>
+                {currentExercise.weight_units && (
+                  <div>
+                    <label style={{
+                      fontSize: 'var(--text-xs)',
+                      color: 'var(--text-tertiary)',
+                      display: 'block',
+                      marginBottom: 'var(--space-1)'
+                    }}>
+                      {t('newWorkout.step2.weight')} (kg)
+                    </label>
+                    <input
+                      type="number"
+                      step="0.5"
+                      className="dark-input"
+                      placeholder="60"
+                      value={set.weight_kg}
+                      onChange={(e) => updateSet(setIndex, 'weight_kg', e.target.value)}
+                      style={{
+                        fontSize: 'var(--text-base)',
+                        padding: 'var(--space-2)'
+                      }}
+                    />
+                  </div>
+                )}
 
-                <div>
-                  <label style={{
-                    fontSize: 'var(--text-xs)',
-                    color: 'var(--text-tertiary)',
-                    display: 'block',
-                    marginBottom: 'var(--space-1)'
-                  }}>
-                    {t('newWorkout.step2.duration')} (s)
-                  </label>
-                  <input
-                    type="number"
-                    className="dark-input"
-                    placeholder="30"
-                    value={set.duration_seconds}
-                    onChange={(e) => updateSet(setIndex, 'duration_seconds', e.target.value)}
-                    style={{
-                      fontSize: 'var(--text-base)',
-                      padding: 'var(--space-2)'
-                    }}
-                  />
-                </div>
+                {currentExercise.time_units && (
+                  <div>
+                    <label style={{
+                      fontSize: 'var(--text-xs)',
+                      color: 'var(--text-tertiary)',
+                      display: 'block',
+                      marginBottom: 'var(--space-1)'
+                    }}>
+                      {t('newWorkout.step2.duration')} (s)
+                    </label>
+                    <input
+                      type="number"
+                      className="dark-input"
+                      placeholder="30"
+                      value={set.duration_seconds}
+                      onChange={(e) => updateSet(setIndex, 'duration_seconds', e.target.value)}
+                      style={{
+                        fontSize: 'var(--text-base)',
+                        padding: 'var(--space-2)'
+                      }}
+                    />
+                  </div>
+                )}
               </div>
             </div>
           ))}

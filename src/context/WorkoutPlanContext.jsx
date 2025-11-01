@@ -42,7 +42,7 @@ export const WorkoutPlanProvider = ({ children }) => {
             order_index,
             suggested_sets,
             notes,
-            exercise:exercises(id, name, description)
+            exercise:exercises(id, name, description, weight_units, time_units)
           )
         `)
         .eq('user_id', user.id)

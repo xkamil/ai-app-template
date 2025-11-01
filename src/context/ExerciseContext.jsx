@@ -51,7 +51,9 @@ export const ExerciseProvider = ({ children }) => {
         .insert([{
           user_id: user.id,
           name: exerciseData.name,
-          description: exerciseData.description || null
+          description: exerciseData.description || null,
+          weight_units: exerciseData.weight_units || false,
+          time_units: exerciseData.time_units || false
         }])
         .select('*');
 
@@ -72,12 +74,22 @@ export const ExerciseProvider = ({ children }) => {
     if (!user) return { error: 'User not authenticated' };
 
     try {
+      const updateData = {
+        name: exerciseData.name,
+        description: exerciseData.description || null
+      };
+
+      // Include unit flags if provided
+      if (exerciseData.hasOwnProperty('weight_units')) {
+        updateData.weight_units = exerciseData.weight_units;
+      }
+      if (exerciseData.hasOwnProperty('time_units')) {
+        updateData.time_units = exerciseData.time_units;
+      }
+
       const { data, error } = await supabase
         .from('exercises')
-        .update({
-          name: exerciseData.name,
-          description: exerciseData.description || null
-        })
+        .update(updateData)
         .eq('id', id)
         .select('*');
 
@@ -127,7 +139,9 @@ export const ExerciseProvider = ({ children }) => {
         .insert([{
           user_id: user.id,
           name: `${exercise.name} (kopia)`,
-          description: exercise.description || null
+          description: exercise.description || null,
+          weight_units: exercise.weight_units || false,
+          time_units: exercise.time_units || false
         }])
         .select('*');
 

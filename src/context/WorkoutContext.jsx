@@ -37,7 +37,7 @@ export const WorkoutProvider = ({ children }) => {
             id,
             order_index,
             notes,
-            exercise:exercises(id, name),
+            exercise:exercises(id, name, weight_units, time_units),
             exercise_sets(
               id,
               set_number,

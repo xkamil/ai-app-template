@@ -488,6 +488,52 @@ CREATE TRIGGER update_workout_plan_exercises_updated_at
     EXECUTE FUNCTION public.update_updated_at_column();
 
 -- =====================================================
+-- MIGRATION: ADD UNIT FLAGS TO EXERCISES
+-- =====================================================
+-- Date: 2025-11-01
+-- Description: Adds weight_units and time_units boolean flags to exercises table
+--              and sets default values for exercise_sets
+
+-- Step 1: Add new columns to exercises table
+ALTER TABLE public.exercises
+ADD COLUMN IF NOT EXISTS weight_units BOOLEAN NOT NULL DEFAULT false,
+ADD COLUMN IF NOT EXISTS time_units BOOLEAN NOT NULL DEFAULT false;
+
+COMMENT ON COLUMN public.exercises.weight_units IS 'Whether this exercise uses weight measurements';
+COMMENT ON COLUMN public.exercises.time_units IS 'Whether this exercise uses time/duration measurements';
+
+-- Step 2: Set both flags to true for all existing exercises (backward compatibility)
+UPDATE public.exercises
+SET weight_units = true, time_units = true
+WHERE weight_units = false OR time_units = false;
+
+-- Step 3: Drop old CHECK constraints first (they don't allow 0)
+ALTER TABLE public.exercise_sets
+DROP CONSTRAINT IF EXISTS valid_weight,
+DROP CONSTRAINT IF EXISTS valid_duration;
+
+-- Step 4: Update exercise_sets to set default values for NULL weights and durations
+UPDATE public.exercise_sets
+SET weight_kg = 0
+WHERE weight_kg IS NULL;
+
+UPDATE public.exercise_sets
+SET duration_seconds = 0
+WHERE duration_seconds IS NULL;
+
+-- Step 5: Alter exercise_sets columns to have NOT NULL constraint with default 0
+ALTER TABLE public.exercise_sets
+ALTER COLUMN weight_kg SET NOT NULL,
+ALTER COLUMN weight_kg SET DEFAULT 0,
+ALTER COLUMN duration_seconds SET NOT NULL,
+ALTER COLUMN duration_seconds SET DEFAULT 0;
+
+-- Step 6: Add new CHECK constraints that allow 0 values
+ALTER TABLE public.exercise_sets
+ADD CONSTRAINT valid_weight CHECK (weight_kg >= 0),
+ADD CONSTRAINT valid_duration CHECK (duration_seconds >= 0);
+
+-- =====================================================
 -- SCHEMA COMPLETE
 -- =====================================================
 -- This schema is ready to be executed in Supabase SQL Editor
