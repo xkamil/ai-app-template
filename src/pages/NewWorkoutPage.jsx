@@ -180,7 +180,7 @@ const NewWorkoutPage = () => {
               .map((set, setIndex) => ({
                 set_number: setIndex + 1,
                 reps: set.reps ? parseInt(set.reps) : null,
-                weight_kg: set.weight_kg ? parseFloat(set.weight_kg) : null,
+                weight_kg: set.weight_kg ? parseFloat(set.weight_kg) : 0,
                 duration_seconds: set.duration_seconds ? parseInt(set.duration_seconds) : 0,
                 notes: set.notes || null
               }))
