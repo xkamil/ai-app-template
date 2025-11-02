@@ -1,0 +1,263 @@
+/* ============================================
+   WORKOUT DIARY - LIGHT MODE FITNESS THEME
+   ============================================ */
+
+[data-theme="light"] {
+  /* ========== COLORS ========== */
+
+  /* Background & Surfaces */
+  --bg-primary: #FFFFFF;
+  --bg-secondary: #F5F5F5;
+  --bg-tertiary: #E8E8E8;
+
+  /* Accent Colors (Gradient) */
+  --accent-primary: #FF6B35;
+  --accent-secondary: #F7931E;
+  --accent-gradient: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);
+
+  /* Semantic Colors */
+  --success: #00B386;
+  --warning: #FF9F00;
+  --danger: #E63946;
+  --info: #2E86DE;
+
+  /* Text Colors */
+  --text-primary: #1A1A1A;
+  --text-secondary: #5A5A5A;
+  --text-tertiary: #8A8A8A;
+
+  /* Borders & Dividers */
+  --border-color: #D0D0D0;
+  --divider-color: #E0E0E0;
+
+  /* ========== SHADOWS ========== */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.16);
+}
+
+/* ============================================
+   GLOBAL STYLES FOR LIGHT MODE
+   ============================================ */
+
+[data-theme="light"] body {
+  background-color: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Override Bootstrap default background for light mode */
+[data-theme="light"] .bg-light {
+  background-color: var(--bg-secondary) !important;
+}
+
+/* ============================================
+   LIGHT MODE SPECIFIC OVERRIDES
+   ============================================ */
+
+/* Bottom Nav */
+[data-theme="light"] .bottom-nav {
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border-color);
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.08);
+}
+
+/* Cards */
+[data-theme="light"] .dark-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+}
+
+[data-theme="light"] .dark-card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+/* Input Fields */
+[data-theme="light"] .dark-input {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+}
+
+[data-theme="light"] .dark-input:focus {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.15);
+}
+
+[data-theme="light"] .dark-input::placeholder {
+  color: var(--text-tertiary);
+}
+
+/* Override Bootstrap card for light mode */
+[data-theme="light"] .card {
+  background-color: var(--bg-secondary) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Override Bootstrap text colors for light mode */
+[data-theme="light"] .text-muted {
+  color: var(--text-secondary) !important;
+}
+
+/* Override Bootstrap forms for light mode */
+[data-theme="light"] .form-control {
+  background-color: var(--bg-tertiary) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+[data-theme="light"] .form-control:focus {
+  background-color: var(--bg-tertiary) !important;
+  border-color: var(--accent-primary) !important;
+  color: var(--text-primary) !important;
+  box-shadow: 0 0 0 0.2rem rgba(255, 107, 53, 0.25) !important;
+}
+
+[data-theme="light"] .form-control::placeholder {
+  color: var(--text-tertiary) !important;
+}
+
+/* Override Bootstrap alerts for light mode */
+[data-theme="light"] .alert {
+  background-color: var(--bg-tertiary) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+[data-theme="light"] .alert-danger {
+  background-color: rgba(230, 57, 70, 0.1) !important;
+  border-color: var(--danger) !important;
+  color: var(--danger) !important;
+}
+
+[data-theme="light"] .alert-success {
+  background-color: rgba(0, 179, 134, 0.1) !important;
+  border-color: var(--success) !important;
+  color: var(--success) !important;
+}
+
+/* Badges for light mode */
+[data-theme="light"] .dark-badge {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+[data-theme="light"] .dark-badge.success {
+  background: var(--success);
+  color: white;
+}
+
+[data-theme="light"] .dark-badge.warning {
+  background: var(--warning);
+  color: white;
+}
+
+[data-theme="light"] .dark-badge.danger {
+  background: var(--danger);
+  color: white;
+}
+
+/* Page elements */
+[data-theme="light"] .page-header {
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+}
+
+[data-theme="light"] .page-container {
+  background: var(--bg-primary);
+}
+
+/* Ghost button hover for light mode */
+[data-theme="light"] .ghost-button:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+/* Divider for light mode */
+[data-theme="light"] .divider {
+  background: var(--divider-color);
+}
+
+/* Modal styles for light mode */
+[data-theme="light"] .modal-content {
+  background-color: var(--bg-secondary) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+[data-theme="light"] .modal-header {
+  border-bottom-color: var(--border-color) !important;
+}
+
+[data-theme="light"] .modal-footer {
+  border-top-color: var(--border-color) !important;
+}
+
+/* Close button for light mode */
+[data-theme="light"] .btn-close {
+  filter: invert(0);
+}
+
+/* Additional Bootstrap overrides for light mode */
+[data-theme="light"] .text-primary {
+  color: var(--accent-primary) !important;
+}
+
+[data-theme="light"] label.form-label {
+  color: var(--text-primary) !important;
+}
+
+[data-theme="light"] .btn-primary {
+  background-color: var(--accent-primary) !important;
+  border-color: var(--accent-primary) !important;
+  color: white !important;
+}
+
+[data-theme="light"] .btn-primary:hover {
+  background-color: var(--accent-secondary) !important;
+  border-color: var(--accent-secondary) !important;
+}
+
+[data-theme="light"] .btn-outline-primary {
+  color: var(--accent-primary) !important;
+  border-color: var(--accent-primary) !important;
+}
+
+[data-theme="light"] .btn-outline-primary:hover {
+  background-color: var(--accent-primary) !important;
+  border-color: var(--accent-primary) !important;
+  color: white !important;
+}
+
+[data-theme="light"] .btn-danger {
+  background-color: var(--danger) !important;
+  border-color: var(--danger) !important;
+}
+
+[data-theme="light"] .btn-outline-danger {
+  color: var(--danger) !important;
+  border-color: var(--danger) !important;
+}
+
+[data-theme="light"] .btn-outline-danger:hover {
+  background-color: var(--danger) !important;
+  border-color: var(--danger) !important;
+  color: white !important;
+}
+
+/* List group items */
+[data-theme="light"] .list-group-item {
+  background-color: var(--bg-secondary) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Links */
+[data-theme="light"] a {
+  color: var(--accent-primary) !important;
+}
+
+[data-theme="light"] a:hover {
+  color: var(--accent-secondary) !important;
+}

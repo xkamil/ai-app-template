@@ -335,8 +335,9 @@ export default {
       units: "Jednostki wagi",
       unitsKg: "Kilogramy (kg)",
       unitsLbs: "Funty (lbs)",
-      darkMode: "Tryb ciemny",
-      darkModeAlways: "Zawsze włączony"
+      theme: "Motyw",
+      themeLight: "Jasny",
+      themeDark: "Ciemny"
     },
     data: {
       title: "Dane",

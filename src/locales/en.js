@@ -335,8 +335,9 @@ export default {
       units: "Weight units",
       unitsKg: "Kilograms (kg)",
       unitsLbs: "Pounds (lbs)",
-      darkMode: "Dark mode",
-      darkModeAlways: "Always on"
+      theme: "Theme",
+      themeLight: "Light",
+      themeDark: "Dark"
     },
     data: {
       title: "Data",

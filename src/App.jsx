@@ -2,6 +2,7 @@ import React from 'react'
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import { LanguageProvider } from './context/LanguageContext'
+import { ThemeProvider } from './context/ThemeContext'
 import { ExerciseProvider } from './context/ExerciseContext'
 import { WorkoutProvider } from './context/WorkoutContext'
 import { WorkoutPlanProvider } from './context/WorkoutPlanContext'
@@ -17,12 +18,13 @@ import WorkoutPlansPage from './pages/WorkoutPlansPage'
 
 function App() {
   return (
-    <LanguageProvider>
-      <AuthProvider>
-        <ExerciseProvider>
-          <WorkoutProvider>
-            <WorkoutPlanProvider>
-              <HashRouter>
+    <ThemeProvider>
+      <LanguageProvider>
+        <AuthProvider>
+          <ExerciseProvider>
+            <WorkoutProvider>
+              <WorkoutPlanProvider>
+                <HashRouter>
               <Routes>
                 <Route path="/" element={<LoginPage />} />
                 <Route path="/signup" element={<SignUpPage />} />
@@ -76,12 +78,13 @@ function App() {
                 {/* Catch all - redirect to login or workouts */}
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
-              </HashRouter>
-            </WorkoutPlanProvider>
-          </WorkoutProvider>
-        </ExerciseProvider>
-      </AuthProvider>
-    </LanguageProvider>
+                </HashRouter>
+              </WorkoutPlanProvider>
+            </WorkoutProvider>
+          </ExerciseProvider>
+        </AuthProvider>
+      </LanguageProvider>
+    </ThemeProvider>
   )
 }
 

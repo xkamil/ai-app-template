@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
+import { useTheme } from '../context/ThemeContext';
 import { useNavigate } from 'react-router-dom';
 import BottomNav from '../components/BottomNav';
 import LanguageSwitcher from '../components/LanguageSwitcher';
@@ -9,6 +10,7 @@ import ConfirmModal from '../components/ConfirmModal';
 const ProfilePage = () => {
   const { user, signOut } = useAuth();
   const { t } = useLanguage();
+  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
@@ -75,13 +77,41 @@ const ProfilePage = () => {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
                 <div style={{ fontSize: 'var(--text-base)', color: 'var(--text-primary)', marginBottom: '4px' }}>
-                  🌙 {t('profile.settings.darkMode')}
+                  {theme === 'dark' ? '🌙' : '☀️'} {t('profile.settings.theme')}
                 </div>
                 <div style={{ fontSize: 'var(--text-sm)', color: 'var(--text-tertiary)' }}>
-                  {t('profile.settings.darkModeAlways')}
+                  {theme === 'dark' ? t('profile.settings.themeDark') : t('profile.settings.themeLight')}
                 </div>
               </div>
-              <div style={{ fontSize: 'var(--text-2xl)' }}>●</div>
+              <button
+                onClick={toggleTheme}
+                style={{
+                  background: 'var(--bg-tertiary)',
+                  border: '2px solid var(--border-color)',
+                  borderRadius: '24px',
+                  padding: '8px 16px',
+                  color: 'var(--text-primary)',
+                  fontSize: 'var(--text-sm)',
+                  fontWeight: 'var(--font-semibold)',
+                  cursor: 'pointer',
+                  transition: 'all var(--transition-fast)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.background = 'var(--accent-primary)';
+                  e.target.style.borderColor = 'var(--accent-primary)';
+                  e.target.style.color = 'white';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.background = 'var(--bg-tertiary)';
+                  e.target.style.borderColor = 'var(--border-color)';
+                  e.target.style.color = 'var(--text-primary)';
+                }}
+              >
+                {theme === 'dark' ? '☀️' : '🌙'}
+              </button>
             </div>
           </div>
         </div>

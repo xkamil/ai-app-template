@@ -4,6 +4,7 @@ import App from './App'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap/dist/js/bootstrap.bundle.min.js'
 import './styles/dark-theme.css'
+import './styles/light-theme.css'
 import { registerSW } from './registerSW'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
