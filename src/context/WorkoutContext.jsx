@@ -136,7 +136,7 @@ export const WorkoutProvider = ({ children }) => {
             set_number: set.set_number,
             reps: set.reps,
             weight_kg: set.weight_kg,
-            duration_seconds: set.duration_seconds,
+            duration_seconds: set.duration_seconds || 0,
             notes: set.notes
           }));
 
