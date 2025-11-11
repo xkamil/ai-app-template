@@ -173,6 +173,7 @@ export default {
       addSet: "Add set",
       lastTime: "Last: {sets}×{reps} @ {weight}kg",
       finish: "Finish workout",
+      finishSet: "Finish set",
       finishExercise: "Finish exercise",
       skipExercise: "Skip exercise",
       resumeExercise: "Resume exercise",

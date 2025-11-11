@@ -14,9 +14,19 @@ const LogSetsStep = ({ selectedExercises, workoutData, onUpdateWorkoutData, onBa
   const [showFinishModal, setShowFinishModal] = useState(false);
   const [unfinishedExercisesCount, setUnfinishedExercisesCount] = useState(0);
 
+  // Active set state (track which set is currently active per exercise)
+  // Structure: { exerciseId: activeSetIndex }
+  const [activeSetIndexes, setActiveSetIndexes] = useState({});
+
   const currentExercise = selectedExercises[currentExerciseIndex];
-  const exerciseSets = workoutData.exercises[currentExercise.id]?.sets || [{ reps: '', weight_kg: '', duration_seconds: '', notes: '' }];
+  const exerciseSets = workoutData.exercises[currentExercise.id]?.sets || [{
+    reps: '0',
+    weight_kg: currentExercise.weight_units ? '0' : 0,
+    duration_seconds: currentExercise.time_units ? '0' : 0,
+    notes: ''
+  }];
   const currentStatus = exerciseStatus[currentExercise.id];
+  const activeSetIndex = activeSetIndexes[currentExercise.id] ?? 0;
 
   // Calculate best set for current exercise
   const getBestSetForExercise = (exerciseId) => {
@@ -61,6 +71,16 @@ const LogSetsStep = ({ selectedExercises, workoutData, onUpdateWorkoutData, onBa
     }
   }, [currentExerciseIndex]);
 
+  // Initialize active set index for current exercise if not exists
+  useEffect(() => {
+    if (activeSetIndexes[currentExercise.id] === undefined) {
+      setActiveSetIndexes(prev => ({
+        ...prev,
+        [currentExercise.id]: 0
+      }));
+    }
+  }, [currentExerciseIndex, currentExercise.id, activeSetIndexes]);
+
   const updateSet = (setIndex, field, value) => {
     const updatedSets = [...exerciseSets];
     updatedSets[setIndex] = { ...updatedSets[setIndex], [field]: value };
@@ -97,11 +117,11 @@ const LogSetsStep = ({ selectedExercises, workoutData, onUpdateWorkoutData, onBa
     const historicalSet = lastWorkout?.sets?.find(s => s.set_number === newSetNumber);
 
     // If this set number exists in last workout, use those values
-    // Otherwise, use empty values
+    // Otherwise, use 0 as default
     const newSet = {
-      reps: historicalSet?.reps ?? '',
-      weight_kg: currentExercise.weight_units ? (historicalSet?.weight_kg ?? '') : 0,
-      duration_seconds: currentExercise.time_units ? (historicalSet?.duration_seconds ?? '') : 0,
+      reps: historicalSet?.reps ?? '0',
+      weight_kg: currentExercise.weight_units ? (historicalSet?.weight_kg ?? '0') : 0,
+      duration_seconds: currentExercise.time_units ? (historicalSet?.duration_seconds ?? '0') : 0,
       notes: ''
     };
 
@@ -149,6 +169,43 @@ const LogSetsStep = ({ selectedExercises, workoutData, onUpdateWorkoutData, onBa
     });
   };
 
+  // Check if a set is valid (all required fields are filled)
+  const isSetValid = (set) => {
+    const reps = parseInt(set.reps) || 0;
+    if (reps < 1) return false;
+
+    if (currentExercise.weight_units) {
+      const weight = parseFloat(set.weight_kg);
+      if (weight === null || weight === undefined || isNaN(weight) || weight < 0) return false;
+    }
+
+    if (currentExercise.time_units) {
+      const duration = parseInt(set.duration_seconds);
+      if (duration === null || duration === undefined || isNaN(duration) || duration < 0) return false;
+    }
+
+    return true;
+  };
+
+  // Handle finishing the current active set
+  const handleFinishSet = () => {
+    const currentActiveSetIndex = activeSetIndexes[currentExercise.id] ?? 0;
+    const currentSet = exerciseSets[currentActiveSetIndex];
+    if (!isSetValid(currentSet)) {
+      return; // Button should be disabled, but just in case
+    }
+
+    // Move to next set for this exercise
+    const newIndex = currentActiveSetIndex < exerciseSets.length - 1
+      ? currentActiveSetIndex + 1
+      : exerciseSets.length; // All sets finished, move beyond last set
+
+    setActiveSetIndexes(prev => ({
+      ...prev,
+      [currentExercise.id]: newIndex
+    }));
+  };
+
   const handleFinishExercise = () => {
     // Validate that all sets have at least 1 rep
     const hasInvalidSets = exerciseSets.some(set => {
@@ -191,6 +248,12 @@ const LogSetsStep = ({ selectedExercises, workoutData, onUpdateWorkoutData, onBa
     const newStatus = { ...exerciseStatus };
     delete newStatus[currentExercise.id];
     onExerciseStatusChange(newStatus);
+
+    // Reset active set index to 0 (first set)
+    setActiveSetIndexes(prev => ({
+      ...prev,
+      [currentExercise.id]: 0
+    }));
   };
 
   const handleCancelWorkout = () => {
@@ -236,6 +299,11 @@ const LogSetsStep = ({ selectedExercises, workoutData, onUpdateWorkoutData, onBa
 
   // Check if there's at least one completed exercise
   const hasCompletedExercises = selectedExercises.some(ex => exerciseStatus[ex.id] === 'completed');
+
+  // Check if all exercises are finished (completed or skipped)
+  const allExercisesFinished = selectedExercises.every(ex =>
+    exerciseStatus[ex.id] === 'completed' || exerciseStatus[ex.id] === 'skipped'
+  );
 
   return (
     <div>
@@ -355,14 +423,20 @@ const LogSetsStep = ({ selectedExercises, workoutData, onUpdateWorkoutData, onBa
           )}
 
           {/* Sets List */}
-          {exerciseSets.map((set, setIndex) => (
+          {exerciseSets.map((set, setIndex) => {
+            const isActive = setIndex === activeSetIndex;
+            const isSetComplete = isSetValid(set);
+
+            return (
             <div
               key={setIndex}
               className="dark-card"
               style={{
                 background: 'var(--bg-tertiary)',
                 marginBottom: 'var(--space-3)',
-                padding: 'var(--space-3)'
+                padding: 'var(--space-3)',
+                opacity: isActive ? 1 : 0.3,
+                transition: 'opacity var(--transition-fast)'
               }}
             >
               <div style={{
@@ -419,12 +493,9 @@ const LogSetsStep = ({ selectedExercises, workoutData, onUpdateWorkoutData, onBa
                     placeholder="12"
                     value={set.reps}
                     onChange={(e) => updateSet(setIndex, 'reps', e.target.value)}
-                    disabled={currentStatus === 'completed' || currentStatus === 'skipped'}
                     style={{
                       fontSize: 'calc(var(--text-base) * 1.2)',
-                      padding: 'calc(var(--space-2) * 1.2)',
-                      opacity: (currentStatus === 'completed' || currentStatus === 'skipped') ? 0.6 : 1,
-                      cursor: (currentStatus === 'completed' || currentStatus === 'skipped') ? 'not-allowed' : 'text'
+                      padding: 'calc(var(--space-2) * 1.2)'
                     }}
                   />
                 </div>
@@ -446,12 +517,9 @@ const LogSetsStep = ({ selectedExercises, workoutData, onUpdateWorkoutData, onBa
                       placeholder="60"
                       value={set.weight_kg}
                       onChange={(e) => updateSet(setIndex, 'weight_kg', e.target.value)}
-                      disabled={currentStatus === 'completed' || currentStatus === 'skipped'}
                       style={{
                         fontSize: 'calc(var(--text-base) * 1.2)',
-                        padding: 'calc(var(--space-2) * 1.2)',
-                        opacity: (currentStatus === 'completed' || currentStatus === 'skipped') ? 0.6 : 1,
-                        cursor: (currentStatus === 'completed' || currentStatus === 'skipped') ? 'not-allowed' : 'text'
+                        padding: 'calc(var(--space-2) * 1.2)'
                       }}
                     />
                   </div>
@@ -473,19 +541,41 @@ const LogSetsStep = ({ selectedExercises, workoutData, onUpdateWorkoutData, onBa
                       placeholder="30"
                       value={set.duration_seconds}
                       onChange={(e) => updateSet(setIndex, 'duration_seconds', e.target.value)}
-                      disabled={currentStatus === 'completed' || currentStatus === 'skipped'}
                       style={{
                         fontSize: 'calc(var(--text-base) * 1.2)',
-                        padding: 'calc(var(--space-2) * 1.2)',
-                        opacity: (currentStatus === 'completed' || currentStatus === 'skipped') ? 0.6 : 1,
-                        cursor: (currentStatus === 'completed' || currentStatus === 'skipped') ? 'not-allowed' : 'text'
+                        padding: 'calc(var(--space-2) * 1.2)'
                       }}
                     />
                   </div>
                 )}
               </div>
+
+              {/* Finish Set Button - only show under active set */}
+              {isActive && (
+                <button
+                  onClick={handleFinishSet}
+                  disabled={!isSetComplete}
+                  style={{
+                    width: '100%',
+                    marginTop: 'var(--space-3)',
+                    padding: 'var(--space-3)',
+                    background: isSetComplete ? 'var(--success)' : 'var(--bg-tertiary)',
+                    border: 'none',
+                    borderRadius: 'var(--radius-md)',
+                    color: isSetComplete ? 'white' : 'var(--text-tertiary)',
+                    fontSize: 'var(--text-sm)',
+                    fontWeight: 'var(--font-semibold)',
+                    cursor: isSetComplete ? 'pointer' : 'not-allowed',
+                    opacity: isSetComplete ? 1 : 0.5,
+                    transition: 'all var(--transition-fast)'
+                  }}
+                >
+                  ✓ {t('newWorkout.step2.finishSet') || 'Zakończ serię'}
+                </button>
+              )}
             </div>
-          ))}
+            );
+          })}
 
           {/* Add Set Button */}
           {currentStatus !== 'completed' && currentStatus !== 'skipped' && (
@@ -517,73 +607,6 @@ const LogSetsStep = ({ selectedExercises, workoutData, onUpdateWorkoutData, onBa
             </button>
           )}
 
-          {/* Finish/Skip Exercise Buttons */}
-          <div style={{
-            display: 'flex',
-            gap: 'var(--space-2)',
-            marginBottom: 'var(--space-3)'
-          }}>
-            {/* Show Finish and Skip buttons only if exercise is not completed or skipped */}
-            {currentStatus !== 'completed' && currentStatus !== 'skipped' && (
-              <>
-                <button
-                  onClick={handleFinishExercise}
-                  style={{
-                    flex: 1,
-                    padding: 'var(--space-3)',
-                    background: 'var(--success)',
-                    border: 'none',
-                    borderRadius: 'var(--radius-md)',
-                    color: 'white',
-                    fontSize: 'var(--text-sm)',
-                    fontWeight: 'var(--font-semibold)',
-                    cursor: 'pointer',
-                    transition: 'all var(--transition-fast)'
-                  }}
-                >
-                  ✓ {t('newWorkout.step2.finishExercise')}
-                </button>
-                <button
-                  onClick={handleSkipExercise}
-                  style={{
-                    flex: 1,
-                    padding: 'var(--space-3)',
-                    background: 'transparent',
-                    border: '1px solid var(--text-tertiary)',
-                    borderRadius: 'var(--radius-md)',
-                    color: 'var(--text-tertiary)',
-                    fontSize: 'var(--text-sm)',
-                    fontWeight: 'var(--font-semibold)',
-                    cursor: 'pointer',
-                    transition: 'all var(--transition-fast)'
-                  }}
-                >
-                  ⊘ {t('newWorkout.step2.skipExercise')}
-                </button>
-              </>
-            )}
-
-            {/* Show Resume button if exercise is completed or skipped */}
-            {(currentStatus === 'completed' || currentStatus === 'skipped') && (
-              <button
-                onClick={handleResumeExercise}
-                style={{
-                  flex: 1,
-                  padding: 'var(--space-3)',
-                  background: 'transparent',
-                  border: '1px solid var(--warning)',
-                  borderRadius: 'var(--radius-md)',
-                  color: 'var(--warning)',
-                  fontSize: 'var(--text-sm)',
-                  fontWeight: 'var(--font-semibold)',
-                  cursor: 'pointer',
-                  transition: 'all var(--transition-fast)'
-                }}
-              >
-                {t('newWorkout.step2.resumeExercise') || 'Wznów ćwiczenie'}
-              </button>
-            )}
-          </div>
 
           {/* Exercise Notes */}
           <div>
@@ -621,11 +644,111 @@ const LogSetsStep = ({ selectedExercises, workoutData, onUpdateWorkoutData, onBa
         borderTop: '1px solid var(--border-color)',
         zIndex: 10
       }}>
+        {/* Top Row - Exercise Buttons */}
+        <div style={{
+          display: 'flex',
+          gap: 'var(--space-2)',
+          maxWidth: '100%',
+          marginBottom: 'var(--space-2)'
+        }}>
+          {/* Show Finish/Skip buttons if exercise is not completed or skipped */}
+          {currentStatus !== 'completed' && currentStatus !== 'skipped' && (
+            <>
+              {/* Finish Exercise Button */}
+              <button
+                onClick={handleFinishExercise}
+                disabled={activeSetIndex < exerciseSets.length}
+                style={{
+                  flex: 1,
+                  padding: 'var(--space-3)',
+                  background: activeSetIndex >= exerciseSets.length ? 'var(--success)' : 'var(--bg-tertiary)',
+                  border: 'none',
+                  borderRadius: 'var(--radius-md)',
+                  color: activeSetIndex >= exerciseSets.length ? 'white' : 'var(--text-tertiary)',
+                  fontSize: 'var(--text-sm)',
+                  fontWeight: 'var(--font-semibold)',
+                  cursor: activeSetIndex >= exerciseSets.length ? 'pointer' : 'not-allowed',
+                  opacity: activeSetIndex >= exerciseSets.length ? 1 : 0.5,
+                  transition: 'all var(--transition-fast)'
+                }}
+              >
+                ✓ {t('newWorkout.step2.finishExercise')}
+              </button>
+
+              {/* Skip Exercise Button */}
+              <button
+                onClick={handleSkipExercise}
+                style={{
+                  flex: 1,
+                  padding: 'var(--space-3)',
+                  background: 'transparent',
+                  border: '1px solid var(--text-tertiary)',
+                  borderRadius: 'var(--radius-md)',
+                  color: 'var(--text-tertiary)',
+                  fontSize: 'var(--text-sm)',
+                  fontWeight: 'var(--font-semibold)',
+                  cursor: 'pointer',
+                  transition: 'all var(--transition-fast)'
+                }}
+              >
+                ⊘ {t('newWorkout.step2.skipExercise')}
+              </button>
+            </>
+          )}
+
+          {/* Show Resume button if exercise is completed or skipped */}
+          {(currentStatus === 'completed' || currentStatus === 'skipped') && (
+            <button
+              onClick={handleResumeExercise}
+              style={{
+                flex: 1,
+                padding: 'var(--space-3)',
+                background: 'transparent',
+                border: '1px solid var(--warning)',
+                borderRadius: 'var(--radius-md)',
+                color: 'var(--warning)',
+                fontSize: 'var(--text-sm)',
+                fontWeight: 'var(--font-semibold)',
+                cursor: 'pointer',
+                transition: 'all var(--transition-fast)'
+              }}
+            >
+              {t('newWorkout.step2.resumeExercise') || 'Wznów ćwiczenie'}
+            </button>
+          )}
+        </div>
+
+        {/* Bottom Row - Workout Buttons */}
         <div style={{
           display: 'flex',
           gap: 'var(--space-2)',
           maxWidth: '100%'
         }}>
+          {/* Finish Workout Button - Only show if at least 1 exercise is completed */}
+          {hasCompletedExercises && (
+            <button
+              onClick={handleFinishWorkout}
+              style={{
+                flex: 1,
+                padding: 'var(--space-3)',
+                fontSize: 'var(--text-sm)',
+                fontWeight: 'var(--font-semibold)',
+                background: allExercisesFinished
+                  ? 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))'
+                  : 'transparent',
+                border: allExercisesFinished
+                  ? 'none'
+                  : '1px solid var(--accent-primary)',
+                borderRadius: 'var(--radius-md)',
+                color: allExercisesFinished ? 'white' : 'var(--accent-primary)',
+                cursor: 'pointer',
+                transition: 'all var(--transition-fast)'
+              }}
+            >
+              {t('newWorkout.step2.finish')}
+            </button>
+          )}
+
           {/* Cancel Workout Button */}
           <button
             onClick={handleCancelWorkout}
@@ -643,22 +766,6 @@ const LogSetsStep = ({ selectedExercises, workoutData, onUpdateWorkoutData, onBa
           >
             {t('newWorkout.step2.cancel')}
           </button>
-
-          {/* Finish Workout Button - Only show if at least 1 exercise is completed */}
-          {hasCompletedExercises && (
-            <button
-              onClick={handleFinishWorkout}
-              className="gradient-button"
-              style={{
-                flex: 1,
-                padding: 'var(--space-3)',
-                fontSize: 'var(--text-sm)',
-                fontWeight: 'var(--font-semibold)'
-              }}
-            >
-              {t('newWorkout.step2.finish')}
-            </button>
-          )}
         </div>
       </div>
 

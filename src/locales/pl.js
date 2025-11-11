@@ -173,6 +173,7 @@ export default {
       addSet: "Dodaj serię",
       lastTime: "Ostatnio: {sets}×{reps} @ {weight}kg",
       finish: "Zakończ trening",
+      finishSet: "Zakończ serię",
       finishExercise: "Zakończ ćwiczenie",
       skipExercise: "Pomiń ćwiczenie",
       resumeExercise: "Wznów ćwiczenie",
